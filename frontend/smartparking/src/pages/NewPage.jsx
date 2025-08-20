@@ -1,86 +1,120 @@
-import React from "react";
-import { Button } from "antd";
-import ImgBg1 from '../assets/parkinglotimg.jpg';
+import React, { useEffect, useState } from "react";
+import { Button, message, Modal } from "antd";
+import { format } from "date-fns";
+import { vi } from "date-fns/locale";
 import { useTheme } from "../hooks/useTheme";
+import { getAllNews, getNewById } from "../services/NewService";
 
 const NewsPage = () => {
     const { theme } = useTheme();
-    const bgClass3 = theme === 'dark' ? 'bg-gray-600' : 'bg-white';
+    const isDark = theme === "dark";
 
-    const news = [
-        {
-            id: 1,
-            title: "Smart Parking triển khai ở Hà Nội",
-            desc: "Hệ thống bãi đỗ xe thông minh giúp giảm ùn tắc và tối ưu diện tích đỗ xe.",
-            date: "18/08/2025",
-            image: `${ImgBg1}`
-        },
-        {
-            id: 2,
-            title: "Ứng dụng AI trong quản lý bãi đỗ",
-            desc: "AI giúp phát hiện chỗ trống nhanh chóng và tăng hiệu suất vận hành.",
-            date: "19/08/2025",
-            image: `${ImgBg1}`
-        },
-        {
-            id: 3,
-            title: "Smart Parking mở rộng ở TP.HCM",
-            desc: "Mô hình được áp dụng rộng rãi tại các trung tâm thương mại và khu đô thị.",
-            date: "20/08/2025",
-            image: `${ImgBg1}`
-        },
-        {
-            id: 4,
-            title: "Smart Parking mở rộng ở TP.HCM",
-            desc: "Mô hình được áp dụng rộng rãi tại các trung tâm thương mại và khu đô thị.",
-            date: "20/08/2025",
-            image: `${ImgBg1}`
-        },
-        {
-            id: 5,
-            title: "Smart Parking mở rộng ở TP.HCM",
-            desc: "Mô hình được áp dụng rộng rãi tại các trung tâm thương mại và khu đô thị.",
-            date: "20/08/2025",
-            image: `${ImgBg1}`
-        },
-        {
-            id: 6,
-            title: "Smart Parking mở rộng ở TP.HCM",
-            desc: "Mô hình được áp dụng rộng rãi tại các trung tâm thương mại và khu đô thị.",
-            date: "20/08/2025",
-            image: `${ImgBg1}`
-        },
-    ];
+    const [news, setNews] = useState([]);
+    const [selectedNews, setSelectedNews] = useState(null);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+
+    useEffect(() => {
+        const fetchNews = async () => {
+            try {
+                const res = await getAllNews();
+                setNews(res.data);
+            } catch (err) {
+                console.error("Lỗi fetch data: ", err);
+                message.error("Không thể tải tin tức. Vui lòng thử lại sau!");
+            }
+        };
+        fetchNews();
+    }, []);
+
+    const handleViewDetail = async (id) => {
+        try {
+            const res = await getNewById(id);
+            setSelectedNews(res.data);
+            setIsModalVisible(true);
+        } catch (err) {
+            console.error("Lỗi fetch chi tiết tin tức: ", err);
+            message.error("Không thể tải chi tiết tin tức!");
+        }
+    };
+
+    const handleCloseModal = () => {
+        setIsModalVisible(false);
+        setSelectedNews(null);
+    };
 
     return (
         <div className="max-w-5xl mx-auto p-6">
-            <h2 className="text-3xl font-bold mb-6">Tin tức mới nhất</h2>
-            <div className="space-y-6">
-                {news.map((item) => (
-                    <div
-                        key={item.id}
-                        className={`flex items-center ${bgClass3} shadow-md rounded-xl overflow-hidden hover:shadow-lg transition`}
-                    >
-                        <img
-                            src={item.image}
-                            alt={item.title}
-                            className="w-40 h-28 object-cover"
-                        />
-                        <div className="p-4 flex-1">
-                            <h3 className="text-xl font-semibold">{item.title}</h3>
-                            <p className=" text-sm mt-1">{item.desc}</p>
-                            <span className="text-xs mt-2 block">
-                                {item.date}
-                            </span>
-                            <div className="mt-3">
-                                <Button type="primary" size="small">
-                                    Xem chi tiết
-                                </Button>
+            <h2 className={`text-3xl font-bold mb-6 ${isDark ? "text-white" : "text-green-600"}`}>
+                Tin tức mới nhất
+            </h2>
+
+            {news.length === 0 ? (
+                <p className="text-center text-gray-500">Không có tin tức nào.</p>
+            ) : (
+                <div className="space-y-6">
+                    {news.map((item) => (
+                        <div
+                            key={item.id}
+                            className={`flex items-center rounded-xl overflow-hidden shadow-sm transition 
+                                ${isDark
+                                    ? "bg-gray-600 text-white"
+                                    : "bg-white text-black border border-gray-200 hover:border-green-400"
+                                }`}
+                        >
+                            <div className="p-4 flex-1">
+                                <h3 className="text-lg font-semibold">{item.title}</h3>
+                                <p className="text-sm mt-1 text-gray-600 dark:text-gray-300 line-clamp-2">{item.content}</p>
+                                <div className="mt-3">
+                                    <Button
+                                        size="small"
+                                        style={
+                                            isDark
+                                                ? {}
+                                                : {
+                                                    backgroundColor: "#22c55e",
+                                                    borderColor: "#22c55e",
+                                                    color: "#fff",
+                                                }
+                                        }
+                                        onClick={() => handleViewDetail(item.id)}
+                                    >
+                                        Xem chi tiết
+                                    </Button>
+                                </div>
                             </div>
                         </div>
+                    ))}
+                </div>
+            )}
+
+            <Modal
+                title={
+                    <span className="text-black font-bold">
+                        {selectedNews?.title}
+                    </span>
+                }
+                open={isModalVisible}
+                onCancel={handleCloseModal}
+                footer={[
+                    <Button key="close" onClick={handleCloseModal}>
+                        Đóng
+                    </Button>,
+                ]}
+            >
+                {selectedNews ? (
+                    <div>
+                        <p className={`text-sm mb-2 text-gray-700`}>
+                            Đăng bởi: {selectedNews.postedBy.fullName} ({selectedNews.postedBy.username})
+                        </p>
+                        <p className={`text-sm mb-4 text-gray-600`}>
+                            Ngày đăng: {format(new Date(selectedNews.postedAt), "dd/MM/yyyy HH:mm", { locale: vi })}
+                        </p>
+                        <p>{selectedNews.content}</p>
                     </div>
-                ))}
-            </div>
+                ) : (
+                    <p>Đang tải...</p>
+                )}
+            </Modal>
         </div>
     );
 };

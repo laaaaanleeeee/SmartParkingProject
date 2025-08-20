@@ -11,6 +11,7 @@ import ImgHarware2 from '../assets/barrier.png';
 import ImgHarware3 from '../assets/ovs.jpg';
 import ImgHarware4 from '../assets/webapp.jpg';
 import { useTheme } from "../hooks/useTheme";
+import { NavLink } from "react-router-dom";
 
 
 const HomePage = () => {
@@ -25,9 +26,9 @@ const HomePage = () => {
             <section className="relative">
                 <Carousel autoplay effect="fade">
                     {[ImgBg1, ImgBg2, ImgBg3].map((img, idx) => (
-                        <div key={idx} className="relative h-[90vh]">
+                        <div key={idx} className="relative h-[85vh]">
                             <img src={img} alt="Parking Lot" className="w-full h-full object-cover" />
-                            <div className="absolute inset-0 bg-black/40" />
+                            <div className="absolute inset-0" />
                         </div>
                     ))}
                 </Carousel>
@@ -39,7 +40,7 @@ const HomePage = () => {
                     <p className="text-xl mb-6 max-w-2xl mx-auto">
                         Tìm kiếm và đặt chỗ đỗ xe dễ dàng ở mọi nơi, mọi lúc chỉ với vài thao tác.
                     </p>
-                    <Link to="/booking">
+                    <NavLink to="/parking_lots">
                         <Button
                             type="primary"
                             size="large"
@@ -47,7 +48,7 @@ const HomePage = () => {
                         >
                             Đặt chỗ ngay
                         </Button>
-                    </Link>
+                    </NavLink>
                 </div>
             </section>
 
@@ -214,11 +215,11 @@ const HomePage = () => {
                 <div className="container mx-auto px-6">
                     <h2 className="text-3xl font-bold mb-4">Bạn đã sẵn sàng đặt chỗ chưa?</h2>
                     <p className="text-lg mb-6">Khám phá ngay các bãi đỗ xe gần bạn.</p>
-                    <Link to="/booking">
+                    <NavLink to="/parking_lots">
                         <Button type="primary" size="large" className="bg-yellow-400 hover:bg-yellow-500 text-black px-8 py-2 text-lg rounded-full shadow-lg">
                             Đặt chỗ ngay
                         </Button>
-                    </Link>
+                    </NavLink>
                 </div>
             </section>
         </div>

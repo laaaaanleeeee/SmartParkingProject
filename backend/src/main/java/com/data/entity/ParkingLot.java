@@ -1,2 +1,64 @@
-package com.data.entity;public class ParkingLot {
+package com.data.entity;
+
+import com.data.enums.ParkingLotStatus;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Data
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "parking_lots")
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class ParkingLot {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
+
+    @Column(nullable = false, length = 100)
+    String name;
+
+    @Column(nullable = false)
+    String address;
+
+    Double latitude;
+    Double longitude;
+
+    @Column(name = "total_slots", nullable = false)
+    Integer totalSlots;
+
+    @Column(name = "available_slots", nullable = false)
+    Integer availableSlots;
+
+    @Column(length = 255)
+    String description;
+
+    @Enumerated(EnumType.STRING)
+    ParkingLotStatus parkingLotStatus;
+
+    @ManyToOne
+    @JoinColumn(name = "owner_id", nullable = false)
+    User owner;
+
+    @Column(name = "created_at", nullable = false)
+    LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "parkingLot", fetch = FetchType.LAZY)
+    List<Pricing> pricings;
+
+    @OneToMany(mappedBy = "parkingLot", fetch = FetchType.LAZY)
+    List<Image> images;
+
+    @OneToMany(mappedBy = "parkingLot", fetch = FetchType.LAZY)
+    List<Review> reviews;
 }

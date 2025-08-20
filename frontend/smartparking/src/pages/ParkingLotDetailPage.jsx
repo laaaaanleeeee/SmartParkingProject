@@ -1,69 +1,101 @@
-import React from "react";
-import { NavLink } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { message, Card, Rate } from "antd";
+import { format } from "date-fns";
+import { vi } from "date-fns/locale";
+import { getParkingLotDetail } from "../services/ParkingLotService";
+import ImgBg1 from "../assets/parkinglotimg.jpg";
+import { useNavigate } from "react-router-dom";
+import { Button } from "antd";
+
 
 const ParkingLotDetailPage = () => {
-    const parkingLot = {
-        id: 1,
-        name: "Bãi đỗ xe Trung tâm TP",
-        address: "123 Đường A, Quận B, TP.HCM",
-        price: "10.000đ/giờ",
-        available: 25,
-        services: ["Camera giám sát", "Bảo vệ 24/7", "Rửa xe"],
-        image:
-            "https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=1000&q=80",
+  const { id } = useParams();
+  const [parkingLot, setParkingLot] = useState(null);
+  const navigate = useNavigate();
+
+
+  useEffect(() => {
+    const fetchParkingLot = async () => {
+      try {
+        const res = await getParkingLotDetail(id);
+        setParkingLot(res.data);
+      } catch (err) {
+        console.error("Lỗi fetch chi tiết bãi đỗ: ", err);
+        message.error("Không thể tải chi tiết bãi đỗ!");
+      }
     };
+    fetchParkingLot();
+  }, [id]);
 
-    return (
-        <div className="max-w-5xl mx-auto px-4 py-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                    <img
-                        src={parkingLot.image}
-                        alt={parkingLot.name}
-                        className="w-full h-80 object-cover rounded-xl shadow"
-                    />
-                </div>
+  if (!parkingLot) {
+    return <div className="text-center">Đang tải...</div>;
+  }
 
-                <div className="space-y-4">
-                    <h1 className="text-3xl font-bold">{parkingLot.name}</h1>
-                    <p className="text-gray-600">{parkingLot.address}</p>
-                    <p className="text-lg font-semibold text-blue-600">
-                        Giá: {parkingLot.price}
-                    </p>
-                    <p>
-                        <span className="font-semibold">Số chỗ trống:</span>{" "}
-                        {parkingLot.available}
-                    </p>
-                    <div>
-                        <h3 className="font-semibold mb-2">Dịch vụ:</h3>
-                        <ul className="list-disc pl-5 text-gray-700">
-                            {parkingLot.services.map((s, i) => (
-                                <li key={i}>{s}</li>
-                            ))}
-                        </ul>
-                    </div>
-                    <NavLink to="/parking_lots/id/booking">
-                        <button className=" cursor-pointer bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition-colors">
-                            Đặt chỗ
-                        </button>
-                    </NavLink>
-                </div>
-            </div>
+  const getAverageRating = (reviews) => {
+    if (reviews.length === 0) return 0;
+    return reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length;
+  };
 
-            <div className="mt-12">
-                <h2 className="text-xl font-semibold mb-4">Vị trí bãi đỗ xe</h2>
-                <iframe
-                    title="map"
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.502351197796!2d106.70042341526053!3d10.776530062140019!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f469646b2b1%3A0xd3d8cb3ddc57b8e!2zQ8O0bmcgVmllbiBUaMOgbmg!5e0!3m2!1svi!2s!4v1633781341462!5m2!1svi!2s"
-                    width="100%"
-                    height="400"
-                    allowFullScreen=""
-                    loading="lazy"
-                    className="rounded-lg shadow"
-                ></iframe>
-            </div>
+  const getMinPrice = (pricings) => {
+    if (pricings.length === 0) return "Chưa có giá";
+    return Math.min(...pricings.map((p) => p.pricePerHour)).toLocaleString("vi-VN") + " VNĐ/giờ";
+  };
+
+  return (
+    <div className="max-w-5xl mx-auto p-6">
+      <h2 className="text-3xl font-bold mb-6">{parkingLot.name}</h2>
+      <Card
+        cover={
+          <img
+            alt={parkingLot.name}
+            src={parkingLot.images.length > 0 ? parkingLot.images[0].url : ImgBg1}
+            className="h-64 object-cover"
+          />
+        }
+      >
+        <div className="p-4">
+          <p className="text-sm"><strong>Địa chỉ:</strong> {parkingLot.address}</p>
+          <div className="text-sm mt-2">
+            <span><strong>Đánh giá:</strong> </span>
+            <Rate disabled allowHalf value={getAverageRating(parkingLot.reviews)} />
+            <span> ({parkingLot.reviews.length} đánh giá)</span>
+          </div>
+          <p className="text-sm"><strong>Giá:</strong> {getMinPrice(parkingLot.pricings)}</p>
+          <p className="text-sm"><strong>Số chỗ:</strong> {parkingLot.availableSlots}/{parkingLot.totalSlots}</p>
+          <p className="text-sm"><strong>Mô tả:</strong> {parkingLot.description}</p>
+          <p className="text-sm"><strong>Trạng thái:</strong> {parkingLot.parkingLotStatus}</p>
+          <p className="text-sm"><strong>Chủ sở hữu:</strong> {parkingLot.owner.fullName} ({parkingLot.owner.username})</p>
+          <p className="text-sm">
+            <strong>Ngày tạo:</strong>{" "}
+            {format(new Date(parkingLot.createdAt), "dd/MM/yyyy HH:mm", { locale: vi })}
+          </p>
+          <Button
+            type="primary"
+            className="mt-4"
+            onClick={() => navigate(`/parking-lots/${parkingLot.id}/booking`)}
+          >
+            Đặt chỗ
+          </Button>
         </div>
-    );
+        {parkingLot.reviews.length > 0 && (
+          <div className="p-4">
+            <h3 className="text-lg font-semibold">Đánh giá</h3>
+            {parkingLot.reviews.map((review) => (
+              <div key={review.id} className="mt-2">
+                <p>
+                  <strong>{review.user.fullName}</strong> ({review.rating} sao): {review.comment}
+                </p>
+                <p className="text-xs">
+                  {format(new Date(review.createdAt), "dd/MM/yyyy HH:mm", { locale: vi })}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+      </Card>
+    </div>
+  );
 };
 
 export default ParkingLotDetailPage;
