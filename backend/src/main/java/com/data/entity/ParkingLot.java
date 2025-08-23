@@ -2,14 +2,12 @@ package com.data.entity;
 
 import com.data.enums.ParkingLotStatus;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.*;
 
 @Data
 @Entity
@@ -28,6 +26,12 @@ public class ParkingLot {
     @Column(nullable = false)
     String address;
 
+    @Column(length = 100)
+    String city;
+
+    @Column(length = 100)
+    String ward;
+
     Double latitude;
     Double longitude;
 
@@ -43,7 +47,7 @@ public class ParkingLot {
     @Enumerated(EnumType.STRING)
     ParkingLotStatus parkingLotStatus;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
     User owner;
 
@@ -53,12 +57,31 @@ public class ParkingLot {
     @Column(name = "updated_at")
     LocalDateTime updatedAt;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "parkingLot", fetch = FetchType.LAZY)
-    List<Pricing> pricings;
+    List<Pricing> pricings = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "parkingLot", fetch = FetchType.LAZY)
-    List<Image> images;
+    List<Image> images = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "parkingLot", fetch = FetchType.LAZY)
-    List<Review> reviews;
+    List<Review> reviews = new ArrayList<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "parkingLot", fetch = FetchType.LAZY)
+    List<Slot> slots = new ArrayList<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "parkingLot", fetch = FetchType.LAZY)
+    List<Sensor> sensors = new ArrayList<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "parkingLot", fetch = FetchType.LAZY)
+    List<Booking> bookings = new ArrayList<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "parkingLot", fetch = FetchType.LAZY)
+    List<Voucher> vouchers = new ArrayList<>();
 }

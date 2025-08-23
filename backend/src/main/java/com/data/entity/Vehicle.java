@@ -1,5 +1,6 @@
 package com.data.entity;
 
+import com.data.enums.VehicleType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -7,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -24,11 +24,8 @@ public class Vehicle {
     @Column(name = "license_plate", nullable = false, unique = true, length = 100)
     String licensePlate;
 
-    @Column(name = "entry_time", nullable = false)
-    LocalDateTime entryTime;
-
-    @Column(name = "exit_time")
-    LocalDateTime exitTime;
+    @Enumerated(EnumType.STRING)
+    VehicleType vehicleType;
 
     @ManyToOne
     @JoinColumn(name = "parking_slot_id")

@@ -1,9 +1,9 @@
 package com.data.repository;
 
-import com.data.entity.Payment;
+import com.data.entity.BarrierCommandLog;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface PaymentRepository extends JpaRepository<Payment, Long> {
+public interface BarrierCommandLogRepository extends JpaRepository<BarrierCommandLog, Long> {
 }

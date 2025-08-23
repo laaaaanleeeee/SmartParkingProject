@@ -1,10 +1,6 @@
 package com.data.service;
 
-import com.data.dto.ImageResponseDTO;
-import com.data.dto.ParkingLotResponseDTO;
-import com.data.dto.PricingResponseDTO;
-import com.data.dto.ReviewResponseDTO;
-import com.data.dto.UserResponseDTO;
+import com.data.dto.*;
 import com.data.entity.Image;
 import com.data.entity.ParkingLot;
 import com.data.entity.Pricing;
@@ -13,11 +9,12 @@ import com.data.repository.ParkingLotRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,28 +22,45 @@ import java.util.Optional;
 public class ParkingLotService {
     ParkingLotRepository parkingLotRepository;
 
-    public List<ParkingLotResponseDTO> getAllParkingLots() {
-        List<ParkingLot> parkingLots = parkingLotRepository.findAll();
-        List<ParkingLotResponseDTO> result = new ArrayList<>();
-        for (ParkingLot parkingLot : parkingLots) {
-            result.add(convertToDTO(parkingLot));
+
+    public PageDTO<ParkingLotResponseDTO> getAllParkingLots(
+            String name, String city, String ward, Double minPrice, Double maxPrice, Double minRating, Integer minSlots, Pageable pageable) {
+        Page<ParkingLot> parkingLots;
+        if (name == null && city == null && ward == null && minPrice == null && maxPrice == null && minRating == null && minSlots == null) {
+            parkingLots = parkingLotRepository.findAll(pageable);
         }
-        return result;
+        else if (minPrice != null && maxPrice != null && minPrice > maxPrice) {
+            throw new IllegalArgumentException("minPrice must be less than or equal to maxPrice");
+        }
+        else {
+            parkingLots = parkingLotRepository.findByFilters(name, city, ward, minPrice, maxPrice, minRating, minSlots, pageable);
+        }
+        PageDTO<ParkingLotResponseDTO> pageDTO = new PageDTO<>();
+        pageDTO.setListDTO(parkingLots.map(this::convertToDTO).getContent());
+        pageDTO.setPage(parkingLots.getNumber());
+        pageDTO.setTotalPage(parkingLots.getTotalPages());
+        pageDTO.setSize(parkingLots.getSize());
+        pageDTO.setNumElement(parkingLots.getNumberOfElements());
+        pageDTO.setTotalElement(parkingLots.getTotalElements());
+        pageDTO.setFirst(parkingLots.isFirst());
+        pageDTO.setLast(parkingLots.isLast());
+
+        return pageDTO;
     }
 
     public ParkingLotResponseDTO getParkingLotById(Long id) {
-        Optional<ParkingLot> optionalParkingLot = parkingLotRepository.findById(id);
-        if (optionalParkingLot.isPresent()) {
-            return convertToDTO(optionalParkingLot.get());
-        }
-        return null;
+        return parkingLotRepository.findById(id)
+                .map(this::convertToDTO)
+                .orElse(null);
     }
 
-    private ParkingLotResponseDTO convertToDTO(ParkingLot parkingLot) {
+    public ParkingLotResponseDTO convertToDTO(ParkingLot parkingLot) {
         ParkingLotResponseDTO dto = new ParkingLotResponseDTO();
         dto.setId(parkingLot.getId());
         dto.setName(parkingLot.getName());
         dto.setAddress(parkingLot.getAddress());
+        dto.setCity(parkingLot.getCity());
+        dto.setWard(parkingLot.getWard());
         dto.setLatitude(parkingLot.getLatitude());
         dto.setLongitude(parkingLot.getLongitude());
         dto.setTotalSlots(parkingLot.getTotalSlots());

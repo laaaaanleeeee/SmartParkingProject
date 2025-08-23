@@ -1,114 +1,169 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from 'react';
+import { useLocation, useParams, useNavigate } from 'react-router-dom';
+import { getParkingLotDetail } from '../services/ParkingLotService';
+import {
+  Form,
+  Input,
+  Button,
+  DatePicker,
+  Select,
+  Card,
+  Typography,
+  message,
+  Spin,
+} from 'antd';
+import moment from 'moment';
+
+const { Title, Text } = Typography;
+const { Option } = Select;
 
 const BookingPage = () => {
-  const [form, setForm] = useState({
-    name: "",
-    phone: "",
-    licensePlate: "",
-    vehicleType: "car",
-    date: "",
-    time: "",
-  });
+  const { id } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const [parkingLot, setParkingLot] = useState(location.state?.parkingLot || null);
+  const [loading, setLoading] = useState(!location.state?.parkingLot);
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!parkingLot) {
+      setLoading(true);
+      getParkingLotDetail(id)
+        .then(res => {
+          setParkingLot(res.data);
+        })
+        .catch(() => {
+          message.error('Không thể tải thông tin bãi đỗ');
+        })
+        .finally(() => setLoading(false));
+    }
+  }, [id, parkingLot]);
+
+  const onFinish = (values) => {
+    setSubmitting(true);
+
+    const bookingData = {
+      parkingLotId: id,
+      customerName: values.customerName,
+      phone: values.phone,
+      vehicleType: values.vehicleType,
+      startTime: values.timeRange[0].toISOString(),
+      endTime: values.timeRange[1].toISOString(),
+    };
+
+    setTimeout(() => {
+      setSubmitting(false);
+      message.success('Đặt chỗ thành công!');
+      navigate('/history_booking');
+    }, 1500);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Booking Info:", form);
-    alert("Đặt chỗ thành công!");
-  };
+  if (loading)
+    return <Spin size="large" className="mt-24 mx-auto block" />;
+
+  if (!parkingLot)
+    return (
+      <div className="py-20 text-center text-red-500 text-lg">
+        Không tìm thấy bãi đỗ
+      </div>
+    );
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
-      <div className="max-w-lg mx-auto bg-white p-8 rounded-2xl shadow-lg">
-        <h1 className="text-2xl font-bold mb-6 text-center text-blue-600">
-          Đặt chỗ bãi đỗ xe
-        </h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-gray-700 font-medium">Họ tên</label>
-            <input
-              type="text"
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 font-medium">
-              Số điện thoại
-            </label>
-            <input
-              type="tel"
-              name="phone"
-              value={form.phone}
-              onChange={handleChange}
-              className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 font-medium">
-              Biển số xe
-            </label>
-            <input
-              type="text"
-              name="licensePlate"
-              value={form.licensePlate}
-              onChange={handleChange}
-              className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 font-medium">
-              Loại xe
-            </label>
-            <select
-              name="vehicleType"
-              value={form.vehicleType}
-              onChange={handleChange}
-              className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
-            >
-              <option value="car">Ô tô</option>
-              <option value="motorbike">Xe máy</option>
-              <option value="bicycle">Xe đạp</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-gray-700 font-medium">Ngày</label>
-            <input
-              type="date"
-              name="date"
-              value={form.date}
-              onChange={handleChange}
-              className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 font-medium">Giờ</label>
-            <input
-              type="time"
-              name="time"
-              value={form.time}
-              onChange={handleChange}
-              className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition"
+    <div className="max-w-md mx-auto p-6">
+      <Card className="rounded-lg shadow-lg">
+        <Title level={3} className="mb-6 text-green-600">
+          Đặt chỗ cho bãi đỗ: {parkingLot.name}
+        </Title>
+
+        <Text type="secondary" className="block mb-1">
+          Địa chỉ: {parkingLot.address}, {parkingLot.ward}, {parkingLot.city}
+        </Text>
+        <Text type="secondary" className="block mb-6">
+          Số chỗ trống: {parkingLot.availableSlots} / {parkingLot.totalSlots}
+        </Text>
+
+        <Form
+          layout="vertical"
+          onFinish={onFinish}
+          initialValues={{
+            vehicleType: 'car',
+            timeRange: [moment(), moment().add(1, 'hour')],
+          }}
+        >
+          <Form.Item
+            label="Tên người đặt"
+            name="customerName"
+            rules={[{ required: true, message: 'Vui lòng nhập tên của bạn' }]}
           >
-            Xác nhận đặt chỗ
-          </button>
-        </form>
-      </div>
+            <Input placeholder="Nhập tên" className="rounded-md" />
+          </Form.Item>
+
+          <Form.Item
+            label="Số điện thoại"
+            name="phone"
+            rules={[
+              { required: true, message: 'Vui lòng nhập số điện thoại' },
+              {
+                pattern: /^[0-9]{9,11}$/,
+                message: 'Số điện thoại không hợp lệ (9-11 số)',
+              },
+            ]}
+          >
+            <Input placeholder="Nhập số điện thoại" className="rounded-md" />
+          </Form.Item>
+
+          <Form.Item
+            label="Loại xe"
+            name="vehicleType"
+            rules={[{ required: true, message: 'Vui lòng chọn loại xe' }]}
+          >
+            <Select className="rounded-md">
+              <Option value="car">Ô tô</Option>
+              <Option value="motorbike">Xe máy</Option>
+              <Option value="bicycle">Xe đạp</Option>
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            label="Thời gian đặt chỗ"
+            name="timeRange"
+            rules={[
+              { required: true, message: 'Vui lòng chọn thời gian bắt đầu và kết thúc' },
+              {
+                validator: (_, value) => {
+                  if (!value || value.length !== 2) {
+                    return Promise.reject('Vui lòng chọn thời gian đầy đủ');
+                  }
+                  if (value[0].isAfter(value[1])) {
+                    return Promise.reject('Thời gian bắt đầu phải trước thời gian kết thúc');
+                  }
+                  return Promise.resolve();
+                },
+              },
+            ]}
+          >
+            <DatePicker.RangePicker
+              showTime={{ format: 'HH:mm' }}
+              format="DD/MM/YYYY HH:mm"
+              disabledDate={(current) => current && current < moment().startOf('day')}
+              className="w-full rounded-md"
+            />
+          </Form.Item>
+
+          <Form.Item>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={submitting}
+              block
+              className="rounded-md bg-green-600 hover:bg-green-700 border-green-600"
+            >
+              Đặt chỗ ngay
+            </Button>
+          </Form.Item>
+        </Form>
+      </Card>
     </div>
   );
 };

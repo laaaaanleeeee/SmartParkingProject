@@ -1,9 +1,9 @@
 import api from "../api/axiosInstance";
 
 export const getAllNews = () => {
-    return api.get("/api/news")
+    return api.get("/news")
 }
 
 export const getNewById = (id) => {
-    return api.get(`/api/news/${id}`);
+    return api.get(`/news/${id}`);
 }

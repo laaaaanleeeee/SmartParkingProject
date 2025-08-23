@@ -1,19 +1,25 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { message, Card, Rate } from "antd";
-import { format } from "date-fns";
-import { vi } from "date-fns/locale";
-import { getParkingLotDetail } from "../services/ParkingLotService";
-import ImgBg1 from "../assets/parkinglotimg.jpg";
-import { useNavigate } from "react-router-dom";
-import { Button } from "antd";
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { getParkingLotDetail } from '../services/ParkingLotService';
+import {
+  Row, Col, Card, Descriptions, List, Button, Typography, Tag, Divider,
+  message,
+} from 'antd';
+import {
+  EnvironmentOutlined,
+  DollarCircleOutlined,
+  StarOutlined,
+  ArrowRightOutlined,
+} from '@ant-design/icons';
 
+const { Title, Text } = Typography;
 
 const ParkingLotDetailPage = () => {
   const { id } = useParams();
-  const [parkingLot, setParkingLot] = useState(null);
   const navigate = useNavigate();
-
+  const [parkingLot, setParkingLot] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchParkingLot = async () => {
@@ -21,79 +27,123 @@ const ParkingLotDetailPage = () => {
         const res = await getParkingLotDetail(id);
         setParkingLot(res.data);
       } catch (err) {
-        console.error("Lỗi fetch chi tiết bãi đỗ: ", err);
-        message.error("Không thể tải chi tiết bãi đỗ!");
+        message.error(err);
+        setError('Không thể tải dữ liệu');
+      } finally {
+        setLoading(false);
       }
     };
+
     fetchParkingLot();
   }, [id]);
 
-  if (!parkingLot) {
-    return <div className="text-center">Đang tải...</div>;
-  }
+  if (loading) return <div style={{ padding: 40, textAlign: 'center' }}>Đang tải...</div>;
+  if (error) return <div style={{ padding: 40, color: 'red', textAlign: 'center' }}>{error}</div>;
+  if (!parkingLot) return <div style={{ padding: 40, textAlign: 'center' }}>Không tìm thấy bãi đỗ</div>;
 
-  const getAverageRating = (reviews) => {
-    if (reviews.length === 0) return 0;
-    return reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length;
-  };
+  const mapSrc = `https://www.google.com/maps?q=${parkingLot.latitude},${parkingLot.longitude}&hl=vi&z=16&output=embed`;
 
-  const getMinPrice = (pricings) => {
-    if (pricings.length === 0) return "Chưa có giá";
-    return Math.min(...pricings.map((p) => p.pricePerHour)).toLocaleString("vi-VN") + " VNĐ/giờ";
-  };
+  const statusColor = parkingLot.parkingLotStatus === 'OPEN' ? 'green' : 'red';
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
-      <h2 className="text-3xl font-bold mb-6">{parkingLot.name}</h2>
-      <Card
-        cover={
-          <img
-            alt={parkingLot.name}
-            src={parkingLot.images.length > 0 ? parkingLot.images[0].url : ImgBg1}
-            className="h-64 object-cover"
-          />
-        }
-      >
-        <div className="p-4">
-          <p className="text-sm"><strong>Địa chỉ:</strong> {parkingLot.address}</p>
-          <div className="text-sm mt-2">
-            <span><strong>Đánh giá:</strong> </span>
-            <Rate disabled allowHalf value={getAverageRating(parkingLot.reviews)} />
-            <span> ({parkingLot.reviews.length} đánh giá)</span>
-          </div>
-          <p className="text-sm"><strong>Giá:</strong> {getMinPrice(parkingLot.pricings)}</p>
-          <p className="text-sm"><strong>Số chỗ:</strong> {parkingLot.availableSlots}/{parkingLot.totalSlots}</p>
-          <p className="text-sm"><strong>Mô tả:</strong> {parkingLot.description}</p>
-          <p className="text-sm"><strong>Trạng thái:</strong> {parkingLot.parkingLotStatus}</p>
-          <p className="text-sm"><strong>Chủ sở hữu:</strong> {parkingLot.owner.fullName} ({parkingLot.owner.username})</p>
-          <p className="text-sm">
-            <strong>Ngày tạo:</strong>{" "}
-            {format(new Date(parkingLot.createdAt), "dd/MM/yyyy HH:mm", { locale: vi })}
-          </p>
-          <Button
-            type="primary"
-            className="mt-4"
-            onClick={() => navigate(`/parking-lots/${parkingLot.id}/booking`)}
-          >
-            Đặt chỗ
-          </Button>
-        </div>
-        {parkingLot.reviews.length > 0 && (
-          <div className="p-4">
-            <h3 className="text-lg font-semibold">Đánh giá</h3>
-            {parkingLot.reviews.map((review) => (
-              <div key={review.id} className="mt-2">
-                <p>
-                  <strong>{review.user.fullName}</strong> ({review.rating} sao): {review.comment}
-                </p>
-                <p className="text-xs">
-                  {format(new Date(review.createdAt), "dd/MM/yyyy HH:mm", { locale: vi })}
-                </p>
+    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '32px' }}>
+      <Row gutter={[24, 24]}>
+        <Col xs={24} md={14}>
+          <Card
+            title={
+              <div className="flex-between">
+                <Title level={4} style={{ marginBottom: 0, color: '#389e0d' }}>
+                  {parkingLot.name}
+                </Title>
               </div>
-            ))}
+            }
+            style={{ backgroundColor: '#f6ffed', borderRadius: 8 }}
+          >
+            <Descriptions column={1} layout="vertical" colon={false}>
+              <Descriptions.Item label={<Text strong>Địa chỉ</Text>}>
+                <EnvironmentOutlined /> {parkingLot.address}, {parkingLot.ward}, {parkingLot.city}
+              </Descriptions.Item>
+              <Descriptions.Item label={<Text strong>Số chỗ</Text>}>
+                <Tag color="green">{parkingLot.availableSlots}</Tag> /
+                <Tag>{parkingLot.totalSlots}</Tag>
+              </Descriptions.Item>
+              <Descriptions.Item label={<Text strong>Trạng thái</Text>}>
+                <Tag color={statusColor}>{parkingLot.parkingLotStatus}</Tag>
+              </Descriptions.Item>
+              <Descriptions.Item label={<Text strong>Mô tả</Text>}>
+                {parkingLot.description}
+              </Descriptions.Item>
+            </Descriptions>
+
+            <Divider />
+
+            <Title level={5} style={{ color: '#52c41a' }}>
+              <DollarCircleOutlined /> Giá theo giờ
+            </Title>
+            <List
+              size="small"
+              bordered
+              dataSource={parkingLot.pricings}
+              renderItem={item => (
+                <List.Item>
+                  <b>{item.vehicleType}</b>: {item.pricePerHour} VNĐ/giờ
+                  {item.startTime && ` (từ ${item.startTime} đến ${item.endTime})`}
+                </List.Item>
+              )}
+              style={{ marginBottom: 24 }}
+            />
+
+            <Title level={5} style={{ color: '#52c41a' }}>
+              <StarOutlined /> Đánh giá
+            </Title>
+            <List
+              size="small"
+              bordered
+              dataSource={parkingLot.reviews}
+              renderItem={review => (
+                <List.Item>
+                  <div>
+                    ⭐ {review.rating} — "{review.comment}" – <i>{review.user.name}</i>
+                  </div>
+                </List.Item>
+              )}
+            />
+          </Card>
+        </Col>
+
+        <Col xs={24} md={10}>
+          <Card
+            title={<span style={{ color: '#52c41a' }}>Bản đồ</span>}
+            style={{ borderRadius: 8 }}
+          >
+            <div style={{ width: '100%', height: 400, overflow: 'hidden', borderRadius: 8 }}>
+              <iframe
+                src={mapSrc}
+                title="Bản đồ"
+                width="100%"
+                height="100%"
+                allowFullScreen
+              ></iframe>
+            </div>
+          </Card>
+
+          <div style={{ textAlign: 'center', marginTop: 24 }}>
+            <Button
+              type="primary"
+              size="large"
+              icon={<ArrowRightOutlined />}
+              onClick={() => navigate(`/parking-lots/${parkingLot.id}/booking`, { state: { parkingLot } })}
+              style={{
+                backgroundColor: '#52c41a',
+                borderColor: '#52c41a',
+                borderRadius: 6,
+              }}
+            >
+              Đặt chỗ ngay
+            </Button>
           </div>
-        )}
-      </Card>
+        </Col>
+      </Row>
     </div>
   );
 };

@@ -37,11 +37,18 @@ public class Payment {
     @Column(name = "transaction_id")
     String transactionId;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "booking_id", nullable = false)
     Booking booking;
 
     @ManyToOne
     @JoinColumn(name = "pricing_id")
     Pricing pricing;
+
+    @Column(name = "refund_amount")
+    Double refundAmount;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "refund_status")
+    PaymentStatus refundStatus;
 }

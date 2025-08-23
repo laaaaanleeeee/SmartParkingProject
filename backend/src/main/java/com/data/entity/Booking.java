@@ -2,10 +2,7 @@ package com.data.entity;
 
 import com.data.enums.BookingStatus;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
@@ -21,10 +18,10 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @Column(name = "start_time")
+    @Column(name = "start_time", nullable = false)
     LocalDateTime startTime;
 
-    @Column(name = "end_time")
+    @Column(name = "end_time", nullable = false)
     LocalDateTime endTime;
 
     @Enumerated(EnumType.STRING)
@@ -33,29 +30,39 @@ public class Booking {
     @Column(name = "total_price")
     Double totalPrice;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parking_lot_id", nullable = false)
     ParkingLot parkingLot;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parking_slot_id", nullable = false)
     Slot parkingSlot;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vehicle_id", nullable = false)
     Vehicle vehicle;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pricing_id")
     Pricing pricing;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "voucher_id")
+    Voucher voucher;
 
     @Column(name = "created_at", nullable = false)
     LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     LocalDateTime updatedAt;
+
+    @Column(name = "cancelled_at")
+    LocalDateTime cancelledAt;
+
+    @Column(name = "cancellation_reason", length = 255)
+    String cancellationReason;
 }
