@@ -3,13 +3,16 @@ package com.data.controller;
 import com.data.dto.BookingRequestDTO;
 import com.data.dto.BookingResponseDTO;
 import com.data.dto.PageDTO;
+import com.data.enums.BookingStatus;
 import com.data.service.BookingService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,25 +24,38 @@ public class BookingController {
     BookingService bookingService;
 
     @PostMapping
-    public ResponseEntity<BookingResponseDTO> createBooking(@RequestBody BookingRequestDTO dto) {
-        return ResponseEntity.ok(bookingService.createBooking(dto));
+    public ResponseEntity<BookingResponseDTO> createBooking(
+            @RequestBody BookingRequestDTO dto,
+            Authentication authentication) {
+        String username = authentication.getName();
+        return ResponseEntity.ok(bookingService.createBooking(dto, username));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<BookingResponseDTO> getBookingById(@PathVariable Long id) {
-        BookingResponseDTO dto = bookingService.getBookingById(id);
-        return dto != null ? ResponseEntity.ok(dto) : ResponseEntity.notFound().build();
+    @GetMapping("/me")
+    public ResponseEntity<PageDTO<BookingResponseDTO>> getMyBookings(
+            Pageable pageable,
+            Authentication authentication) {
+        String username = authentication.getName();
+        Long userId = bookingService.getUserIdByUsername(username);
+        return ResponseEntity.ok(bookingService.getBookingsByUser(userId, pageable));
     }
 
-    @GetMapping
-    public ResponseEntity<PageDTO<BookingResponseDTO>> getAllBookings(
-            @PageableDefault(size = 10, sort = "id") Pageable pageable) {
-        return ResponseEntity.ok(bookingService.getAllBookings(pageable));
+    @GetMapping("/lot/{lotId}")
+    public ResponseEntity<PageDTO<BookingResponseDTO>> getBookingsByLot(
+            @PathVariable Long lotId, Pageable pageable) {
+        return ResponseEntity.ok(bookingService.getBookingsByParkingLot(lotId, pageable));
+    }
+
+    @GetMapping("/status/{status}")
+    public ResponseEntity<PageDTO<BookingResponseDTO>> getBookingsByStatus(
+            @PathVariable BookingStatus status, Pageable pageable) {
+        return ResponseEntity.ok(bookingService.getBookingsByStatus(status, pageable));
     }
 
     @PutMapping("/{id}/cancel")
-    public ResponseEntity<Void> cancelBooking(@PathVariable Long id, @RequestParam String reason) {
-        bookingService.cancelBooking(id, reason);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<BookingResponseDTO> cancelBooking(
+            @PathVariable Long id,
+            @RequestParam String reason) {
+        return ResponseEntity.ok(bookingService.cancelBooking(id, reason));
     }
 }

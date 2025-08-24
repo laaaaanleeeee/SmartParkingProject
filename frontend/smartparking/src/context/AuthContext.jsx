@@ -6,6 +6,7 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("accessToken") || null);
+  const [role, setRole] = useState(localStorage.getItem("userRole") || null);
 
   const login = async (username, password) => {
     try {
@@ -13,8 +14,11 @@ export const AuthProvider = ({ children }) => {
       const data = res.data;
 
       setToken(data.accessToken);
+      setRole(data.user.userRole);
+
       localStorage.setItem("accessToken", data.accessToken);
       localStorage.setItem("refreshToken", data.refreshToken);
+      localStorage.setItem("userRole", data.user.userRole);
 
       message.success("Đăng nhập thành công!");
     } catch (err) {
@@ -35,8 +39,10 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setToken(null);
+    setRole(null);
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
+    localStorage.removeItem("userRole");
     message.success("Đã đăng xuất.");
   };
 
@@ -47,7 +53,7 @@ export const AuthProvider = ({ children }) => {
   }, [token]);
 
   return (
-    <AuthContext.Provider value={{ token, login, register, logout }}>
+    <AuthContext.Provider value={{ token, role, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

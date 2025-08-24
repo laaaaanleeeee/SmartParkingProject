@@ -4,6 +4,7 @@ import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import { useTheme } from "../hooks/useTheme";
 import { getAllNews, getNewById } from "../services/NewService";
+import { FloatButton } from 'antd';
 
 const NewsPage = () => {
     const { theme } = useTheme();
@@ -115,6 +116,7 @@ const NewsPage = () => {
                     <p>Đang tải...</p>
                 )}
             </Modal>
+            <FloatButton.BackTop />
         </div>
     );
 };

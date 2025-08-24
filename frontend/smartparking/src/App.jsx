@@ -11,10 +11,11 @@ import ParkingLotDetailPage from './pages/ParkingLotDetailPage';
 import UserInfoPage from './pages/UserInfoPage';
 import SubcriptionPage from './pages/SubcriptionPage';
 import HistoryBookingPage from './pages/HistoryBookingPage';
-import ProductPage from './pages/ProductPage';
+import TechnologyPage from './pages/TechnologyPage';
 import SigninPage from './pages/SigninPage';
 import SignupPage from './pages/SignupPage';
 import PrivateRoute from './routes/PrivateRoute.jsx'
+import RoleBasedLayout from './layout/RoleBasedLayout.jsx'
 
 function App() {
   return (
@@ -23,8 +24,8 @@ function App() {
       <Route path='/sign-in' element={<SigninPage />}></Route>
       <Route path='/sign-up' element={<SignupPage />}></Route>
 
-      <Route path='/' element={<MainLayout />}>
-        <Route path='/' element={<HomePage />}></Route>
+      <Route path='/' element={<RoleBasedLayout />}>
+        <Route path='/' element={<HomePage />} />
         <Route path='/parking-lots' element={<ParkingLotPage />}></Route>
         <Route path='/news' element={<NewPage />}></Route>
         <Route path='/contact' element={<ContactPage />}></Route>
@@ -33,7 +34,7 @@ function App() {
         <Route path='/user' element={<PrivateRoute><UserInfoPage /></PrivateRoute>}></Route>
         <Route path='/subcription' element={<SubcriptionPage />}></Route>
         <Route path='/history_booking' element={<PrivateRoute><HistoryBookingPage /></PrivateRoute>}></Route>
-        <Route path='/products' element={<ProductPage />}></Route>
+        <Route path='/technologies' element={<TechnologyPage />}></Route>
       </Route>
     </Routes>
   )

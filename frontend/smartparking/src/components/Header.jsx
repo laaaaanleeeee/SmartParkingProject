@@ -23,7 +23,32 @@ const Header = () => {
                     <NavLink to="/" className="flex items-center space-x-2">
                         <img src={Logo} alt="Logo" className="w-10 h-auto" />
                     </NavLink>
-
+                    <NavLink
+                        to="/technologies"
+                    >
+                        <div className="cursor-pointer flex items-center hover:text-green-600 transition-colors">
+                            <span>Công nghệ</span>
+                        </div>
+                    </NavLink>
+                    <NavLink
+                        to="/news"
+                    >
+                        <div className="cursor-pointer flex items-center hover:text-green-600 transition-colors">
+                            <span>Tin tức</span>
+                        </div>
+                    </NavLink>
+                    <NavLink
+                        to="/contact"
+                    >
+                        <div className="cursor-pointer flex items-center hover:text-green-600 transition-colors">
+                            <span>Liên hệ</span>
+                        </div>
+                    </NavLink>
+                    <NavLink to="/parking-lots">
+                        <button className=" cursor-pointer bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition-colors">
+                            Đặt chỗ ngay
+                        </button>
+                    </NavLink>
 
                 </div>
 
@@ -38,38 +63,16 @@ const Header = () => {
                             <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
                                 <SearchOutlined />
                             </span>
+
                         </div>
-                        <NavLink
-                            to="/products"
-                        >
-                            <div className="cursor-pointer flex items-center hover:text-green-600 transition-colors">
-                                <span>Sản phẩm</span>
-                            </div>
-                        </NavLink>
-                        <NavLink
-                            to="/news"
-                        >
-                            <div className="cursor-pointer flex items-center hover:text-green-600 transition-colors">
-                                <span>Tin tức</span>
-                            </div>
-                        </NavLink>
-                        <NavLink
-                            to="/contact"
-                        >
-                            <div className="cursor-pointer flex items-center hover:text-green-600 transition-colors">
-                                <span>Liên hệ</span>
-                            </div>
-                        </NavLink>
+
+
                         <Dropdown menu={{ items: accountItems }} placement="bottomRight" arrow>
                             <div className="cursor-pointer flex items-center hover:text-green-600 transition-colors">
                                 <span>Tài khoản</span>
                             </div>
                         </Dropdown>
-                        <NavLink to="/parking-lots">
-                            <button className=" cursor-pointer bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition-colors">
-                                Đặt chỗ ngay
-                            </button>
-                        </NavLink>
+
                         <Switch
                             checked={theme === 'dark'}
                             onChange={(checked) => setTheme(checked ? 'dark' : 'light')}

@@ -14,7 +14,7 @@ import java.util.List;
 
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
-    Page<Booking> findByUserId(Long userId, Pageable pageable);
+    Page<Booking> findByUser_Id(Long userId, Pageable pageable);
 
     Page<Booking> findByBookingStatus(BookingStatus bookingStatus, Pageable pageable);
 
@@ -23,7 +23,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                                   @Param("end") LocalDateTime end,
                                   Pageable pageable);
 
-    Page<Booking> findByParkingLotId(Long parkingLotId, Pageable pageable);
+    Page<Booking> findByParkingLot_Id(Long parkingLotId, Pageable pageable);
 
-    List<Booking> findByParkingSlotId(Long slotId);
+    List<Booking> findByParkingSlot_Id(Long slotId);
 }

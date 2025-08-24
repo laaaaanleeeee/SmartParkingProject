@@ -15,11 +15,33 @@ public class BookingResponseDTO {
     Double totalPrice;
     BookingStatus bookingStatus;
 
+    Long userId;
+    Long parkingLotId;
+    Long parkingSlotId;
+    Long vehicleId;
+    Long voucherId;
+
+    String cancellationReason;
+    String createdAt;
+    String updatedAt;
+    String cancelledAt;
+
     public BookingResponseDTO(Booking booking) {
         this.id = booking.getId();
-        this.startTime = booking.getStartTime().toString();
-        this.endTime = booking.getEndTime().toString();
+        this.startTime = booking.getStartTime() != null ? booking.getStartTime().toString() : null;
+        this.endTime = booking.getEndTime() != null ? booking.getEndTime().toString() : null;
         this.totalPrice = booking.getTotalPrice();
         this.bookingStatus = booking.getBookingStatus();
+
+        this.userId = booking.getUser() != null ? booking.getUser().getId() : null;
+        this.parkingLotId = booking.getParkingLot() != null ? booking.getParkingLot().getId() : null;
+        this.parkingSlotId = booking.getParkingSlot() != null ? booking.getParkingSlot().getId() : null;
+        this.vehicleId = booking.getVehicle() != null ? booking.getVehicle().getId() : null;
+        this.voucherId = booking.getVoucher() != null ? booking.getVoucher().getId() : null;
+
+        this.cancellationReason = booking.getCancellationReason();
+        this.createdAt = booking.getCreatedAt() != null ? booking.getCreatedAt().toString() : null;
+        this.updatedAt = booking.getUpdatedAt() != null ? booking.getUpdatedAt().toString() : null;
+        this.cancelledAt = booking.getCancelledAt() != null ? booking.getCancelledAt().toString() : null;
     }
 }
