@@ -1,4 +1,4 @@
-package com.data.dto;
+package com.data.dto.response;
 
 import com.data.enums.SlotStatus;
 import lombok.AccessLevel;
@@ -11,4 +11,10 @@ public class SlotResponseDTO {
     Long id;
     String slotNumber;
     SlotStatus slotStatus;
+
+    public SlotResponseDTO(Long id, String slotNumber, SlotStatus slotStatus) {
+        this.id = id;
+        this.slotNumber = slotNumber;
+        this.slotStatus = slotStatus;
+    }
 }

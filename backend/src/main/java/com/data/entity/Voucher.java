@@ -1,5 +1,6 @@
 package com.data.entity;
 
+import com.data.enums.DiscountType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -25,6 +26,10 @@ public class Voucher {
 
     @Column(nullable = false)
     Double discount;
+
+    @Column(name = "discount_type")
+    @Enumerated(EnumType.STRING)
+    DiscountType discountType;
 
     @Column(name = "expiry_date", nullable = false)
     LocalDateTime expiryDate;

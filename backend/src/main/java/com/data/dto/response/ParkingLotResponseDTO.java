@@ -1,4 +1,4 @@
-package com.data.dto;
+package com.data.dto.response;
 
 import com.data.enums.ParkingLotStatus;
 import lombok.AccessLevel;

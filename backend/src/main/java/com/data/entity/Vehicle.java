@@ -27,9 +27,17 @@ public class Vehicle {
     @Enumerated(EnumType.STRING)
     VehicleType vehicleType;
 
-    @ManyToOne
-    @JoinColumn(name = "parking_slot_id")
-    Slot slot;
+    @Column(length = 100)
+    String brand;
+
+    @Column(length = 100)
+    String model;
+
+    @Column(length = 50)
+    String color;
+
+    @Column(name = "manufacture_year")
+    Integer manufactureYear;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

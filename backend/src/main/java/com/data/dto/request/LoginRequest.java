@@ -1,4 +1,4 @@
-package com.data.dto;
+package com.data.dto.request;
 
 import lombok.AccessLevel;
 import lombok.Data;

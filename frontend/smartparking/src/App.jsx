@@ -16,6 +16,7 @@ import SigninPage from './pages/SigninPage';
 import SignupPage from './pages/SignupPage';
 import PrivateRoute from './routes/PrivateRoute.jsx'
 import RoleBasedLayout from './layout/RoleBasedLayout.jsx'
+import PaymentPage from './pages/PaymentPage.jsx'
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
         <Route path='/subcription' element={<SubcriptionPage />}></Route>
         <Route path='/history_booking' element={<PrivateRoute><HistoryBookingPage /></PrivateRoute>}></Route>
         <Route path='/technologies' element={<TechnologyPage />}></Route>
+        <Route path='payment/:id' element={<PrivateRoute><PaymentPage /></PrivateRoute>} />
       </Route>
     </Routes>
   )

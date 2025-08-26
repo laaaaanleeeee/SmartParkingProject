@@ -1,7 +1,8 @@
 package com.data.controller;
 
-import com.data.dto.LoginRequest;
-import com.data.dto.UserResponseDTO;
+import com.data.dto.request.LoginRequest;
+import com.data.dto.response.UserResponseDTO;
+import com.data.dto.response.AuthResponse;
 import com.data.entity.User;
 import com.data.security.JwtUtil;
 import com.data.service.UserService;
@@ -48,7 +49,7 @@ public class AuthController {
             String access = jwtUtil.generateAccessToken(user.getUsername(), user.getUserRole().name());
             String refresh = jwtUtil.generateRefreshToken(user.getUsername());
 
-            var resp = new com.data.dto.AuthResponse(access, refresh, 3600000L, new UserResponseDTO(user));
+            var resp = new AuthResponse(access, refresh, 3600000L, new UserResponseDTO(user));
             return ResponseEntity.ok(resp);
         } catch (BadCredentialsException ex) {
             return ResponseEntity.status(401).body("Invalid username or password");
@@ -63,7 +64,7 @@ public class AuthController {
 
             var user = (User) userService.loadUserByUsername(username);
             String newAccess = jwtUtil.generateAccessToken(user.getUsername(), user.getUserRole().name());
-            var resp = new com.data.dto.AuthResponse(newAccess, refreshToken, 3600000L, new UserResponseDTO(user));
+            var resp = new AuthResponse(newAccess, refreshToken, 3600000L, new UserResponseDTO(user));
             return ResponseEntity.ok(resp);
         } catch (Exception e) {
             return ResponseEntity.status(401).body("Invalid refresh token");

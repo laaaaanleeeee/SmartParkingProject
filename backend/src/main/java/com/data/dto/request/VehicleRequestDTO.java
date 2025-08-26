@@ -1,4 +1,4 @@
-package com.data.dto;
+package com.data.dto.request;
 
 import com.data.enums.VehicleType;
 import lombok.AccessLevel;
@@ -7,8 +7,11 @@ import lombok.experimental.FieldDefaults;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class VehicleResponseDTO {
-    Long id;
+public class VehicleRequestDTO {
     String licensePlate;
     VehicleType vehicleType;
+    String brand;
+    String model;
+    String color;
+    Integer manufactureYear;
 }

@@ -1,23 +1,19 @@
 package com.data.controller;
 
-import com.data.dto.BookingRequestDTO;
-import com.data.dto.BookingResponseDTO;
-import com.data.dto.PageDTO;
-import com.data.enums.BookingStatus;
+import com.data.dto.request.BookingRequestDTO;
+import com.data.dto.response.BookingResponseDTO;
+import com.data.dto.response.PageDTO;
 import com.data.service.BookingService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/bookings")
-@CrossOrigin(origins = "http://localhost:5173")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BookingController {
@@ -36,20 +32,12 @@ public class BookingController {
             Pageable pageable,
             Authentication authentication) {
         String username = authentication.getName();
-        Long userId = bookingService.getUserIdByUsername(username);
-        return ResponseEntity.ok(bookingService.getBookingsByUser(userId, pageable));
+        return ResponseEntity.ok(bookingService.getBookingsByUser(username, pageable));
     }
 
-    @GetMapping("/lot/{lotId}")
-    public ResponseEntity<PageDTO<BookingResponseDTO>> getBookingsByLot(
-            @PathVariable Long lotId, Pageable pageable) {
-        return ResponseEntity.ok(bookingService.getBookingsByParkingLot(lotId, pageable));
-    }
-
-    @GetMapping("/status/{status}")
-    public ResponseEntity<PageDTO<BookingResponseDTO>> getBookingsByStatus(
-            @PathVariable BookingStatus status, Pageable pageable) {
-        return ResponseEntity.ok(bookingService.getBookingsByStatus(status, pageable));
+    @GetMapping("/{id}")
+    public ResponseEntity<BookingResponseDTO> getBookingById(@PathVariable Long id) {
+        return ResponseEntity.ok(bookingService.getBookingById(id));
     }
 
     @PutMapping("/{id}/cancel")
@@ -57,5 +45,15 @@ public class BookingController {
             @PathVariable Long id,
             @RequestParam String reason) {
         return ResponseEntity.ok(bookingService.cancelBooking(id, reason));
+    }
+
+    @PutMapping("/{id}/confirm")
+    public ResponseEntity<BookingResponseDTO> confirmBooking(@PathVariable Long id) {
+        return ResponseEntity.ok(bookingService.confirmBooking(id));
+    }
+
+    @PutMapping("/{id}/complete")
+    public ResponseEntity<BookingResponseDTO> completeBooking(@PathVariable Long id) {
+        return ResponseEntity.ok(bookingService.completeBooking(id));
     }
 }

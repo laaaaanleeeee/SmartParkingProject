@@ -1,7 +1,7 @@
 package com.data.controller;
 
-import com.data.dto.PageDTO;
-import com.data.dto.ParkingLotResponseDTO;
+import com.data.dto.response.PageDTO;
+import com.data.dto.response.ParkingLotResponseDTO;
 import com.data.service.ParkingLotService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

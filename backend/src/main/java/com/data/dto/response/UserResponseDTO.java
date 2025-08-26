@@ -1,4 +1,4 @@
-package com.data.dto;
+package com.data.dto.response;
 
 import com.data.entity.User;
 import com.data.enums.UserRole;

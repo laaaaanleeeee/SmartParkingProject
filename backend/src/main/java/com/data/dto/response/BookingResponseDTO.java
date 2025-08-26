@@ -1,4 +1,4 @@
-package com.data.dto;
+package com.data.dto.response;
 
 import com.data.entity.Booking;
 import com.data.enums.BookingStatus;
@@ -21,10 +21,11 @@ public class BookingResponseDTO {
     Long vehicleId;
     Long voucherId;
 
-    String cancellationReason;
     String createdAt;
     String updatedAt;
     String cancelledAt;
+    String expireAt;
+    String cancellationReason;
 
     public BookingResponseDTO(Booking booking) {
         this.id = booking.getId();
@@ -39,9 +40,10 @@ public class BookingResponseDTO {
         this.vehicleId = booking.getVehicle() != null ? booking.getVehicle().getId() : null;
         this.voucherId = booking.getVoucher() != null ? booking.getVoucher().getId() : null;
 
-        this.cancellationReason = booking.getCancellationReason();
         this.createdAt = booking.getCreatedAt() != null ? booking.getCreatedAt().toString() : null;
         this.updatedAt = booking.getUpdatedAt() != null ? booking.getUpdatedAt().toString() : null;
         this.cancelledAt = booking.getCancelledAt() != null ? booking.getCancelledAt().toString() : null;
+        this.expireAt = booking.getExpireAt() != null ? booking.getExpireAt().toString() : null;
+        this.cancellationReason = booking.getCancellationReason();
     }
 }

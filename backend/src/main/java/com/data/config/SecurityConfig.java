@@ -24,7 +24,8 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
+        http
+                .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/refresh").permitAll()
@@ -32,12 +33,19 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/bookings/**").hasAnyRole("CLIENT", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/bookings/**").hasRole("CLIENT")
                         .requestMatchers(HttpMethod.PUT, "/api/bookings/**").hasRole("CLIENT")
+                        .requestMatchers(HttpMethod.GET, "/api/vehicles/me").hasRole("CLIENT")
+                        .requestMatchers(HttpMethod.POST, "/api/vehicles").hasRole("CLIENT")
+                        .requestMatchers(HttpMethod.PUT, "/api/vehicles/**").hasRole("CLIENT")
+                        .requestMatchers(HttpMethod.DELETE, "/api/vehicles/**").hasRole("CLIENT")
+                        .requestMatchers("/api/vehicles/**").hasRole("ADMIN")
                         .requestMatchers("/api/owner/**").hasRole("OWNER")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling(ex -> ex.authenticationEntryPoint((req, res, e) -> res.sendError(401, "Unauthorized")));
+                .exceptionHandling(ex -> ex.authenticationEntryPoint((req, res, e) -> res.sendError(401, "Unauthorized")))
+                .cors(cors -> {});
+
         return http.build();
     }
 
@@ -47,5 +55,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 }

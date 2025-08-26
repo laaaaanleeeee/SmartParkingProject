@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -32,12 +33,13 @@ public class JwtUtil {
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuer(issuer)
-                .addClaims(Map.of("role", role))
+                .claim("authorities", List.of("ROLE_" + role))
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + accessExpMs))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
+
 
     public String generateRefreshToken(String username) {
         return Jwts.builder()

@@ -65,4 +65,10 @@ public class Booking {
 
     @Column(name = "cancellation_reason", length = 255)
     String cancellationReason;
+
+    @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL)
+    Payment payment;
+
+    @Column(name = "expire_at")
+    LocalDateTime expireAt;
 }

@@ -1,7 +1,7 @@
 package com.data.service;
 
-import com.data.dto.NewsResponseDTO;
-import com.data.dto.UserResponseDTO;
+import com.data.dto.response.NewsResponseDTO;
+import com.data.dto.response.UserResponseDTO;
 import com.data.entity.News;
 import com.data.repository.NewsRepository;
 import lombok.AccessLevel;

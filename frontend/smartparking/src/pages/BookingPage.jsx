@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { useLocation, useParams, useNavigate } from 'react-router-dom';
-import { getParkingLotDetail } from '../services/ParkingLotService';
+import React, { useEffect, useState } from "react";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
+import { getParkingLotDetail } from "../services/ParkingLotService";
+import { getMyVehicles } from "../services/VehicleService";
+import { getSlotByParkingLotId } from "../services/SlotService";
+import { createBooking } from "../services/BookingService";
 import {
   Form,
-  Input,
   Button,
   DatePicker,
   Select,
@@ -11,8 +13,8 @@ import {
   Typography,
   message,
   Spin,
-} from 'antd';
-import moment from 'moment';
+} from "antd";
+import moment from "moment";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -23,143 +25,151 @@ const BookingPage = () => {
   const navigate = useNavigate();
 
   const [parkingLot, setParkingLot] = useState(location.state?.parkingLot || null);
-  const [loading, setLoading] = useState(!location.state?.parkingLot);
+  const [vehicles, setVehicles] = useState([]);
+  const [slots, setSlots] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!parkingLot) {
-      setLoading(true);
-      getParkingLotDetail(id)
-        .then(res => {
+    const fetchData = async () => {
+      try {
+        const vehiclesRes = await getMyVehicles();
+        setVehicles(vehiclesRes.data);
+
+        if (!parkingLot) {
+          const res = await getParkingLotDetail(id);
           setParkingLot(res.data);
-        })
-        .catch(() => {
-          message.error('Không thể tải thông tin bãi đỗ');
-        })
-        .finally(() => setLoading(false));
-    }
-  }, [id, parkingLot]);
+        }
 
-  const onFinish = (values) => {
-    setSubmitting(true);
-
-    const bookingData = {
-      parkingLotId: id,
-      customerName: values.customerName,
-      phone: values.phone,
-      vehicleType: values.vehicleType,
-      startTime: values.timeRange[0].toISOString(),
-      endTime: values.timeRange[1].toISOString(),
+        const slotsRes = await getSlotByParkingLotId(id);
+        setSlots(slotsRes.data);
+      } catch (error) {
+        console.error(error);
+        message.error("Không thể tải dữ liệu đặt chỗ");
+      } finally {
+        setLoading(false);
+      }
     };
 
-    setTimeout(() => {
+    fetchData();
+  }, [id, parkingLot]);
+
+  const onFinish = async (values) => {
+    setSubmitting(true);
+    const bookingData = {
+      parkingLotId: id,
+      parkingSlotId: values.parkingSlotId,
+      vehicleId: values.vehicleId,
+      startTime: values.startTime.toISOString(),
+      endTime: values.endTime.toISOString(),
+      voucherId: null,
+    };
+
+    try {
+      const res = await createBooking(bookingData);
+      message.success("Đặt chỗ thành công, vui lòng thanh toán!");
+      navigate(`/payment/${res.data.id}`, { state: { booking: res.data, method: values.paymentMethod } });
+    } catch (error) {
+      console.error(error);
+      message.error(error.response?.data?.message || "Đặt chỗ thất bại");
+    } finally {
       setSubmitting(false);
-      message.success('Đặt chỗ thành công!');
-      navigate('/history_booking');
-    }, 1500);
+    }
   };
 
-  if (loading)
-    return <Spin size="large" className="mt-24 mx-auto block" />;
-
-  if (!parkingLot)
-    return (
-      <div className="py-20 text-center text-red-500 text-lg">
-        Không tìm thấy bãi đỗ
-      </div>
-    );
+  if (loading) return <Spin size="large" className="mt-24 mx-auto block" />;
+  if (!parkingLot) return <div className="py-20 text-center text-red-500">Không tìm thấy bãi đỗ</div>;
 
   return (
     <div className="max-w-md mx-auto p-6">
       <Card className="rounded-lg shadow-lg">
-        <Title level={3} className="mb-6 text-green-600">
-          Đặt chỗ cho bãi đỗ: {parkingLot.name}
-        </Title>
+        <Title level={3}>Đặt chỗ cho bãi đỗ: {parkingLot.name}</Title>
 
-        <Text type="secondary" className="block mb-1">
+        <Text type="secondary" className="block mb-6">
           Địa chỉ: {parkingLot.address}, {parkingLot.ward}, {parkingLot.city}
         </Text>
-        <Text type="secondary" className="block mb-6">
-          Số chỗ trống: {parkingLot.availableSlots} / {parkingLot.totalSlots}
-        </Text>
 
-        <Form
-          layout="vertical"
-          onFinish={onFinish}
-          initialValues={{
-            vehicleType: 'car',
-            timeRange: [moment(), moment().add(1, 'hour')],
-          }}
-        >
+        <Form layout="vertical" onFinish={onFinish}>
           <Form.Item
-            label="Tên người đặt"
-            name="customerName"
-            rules={[{ required: true, message: 'Vui lòng nhập tên của bạn' }]}
+            label="Chọn xe"
+            name="vehicleId"
+            rules={[{ required: true, message: "Vui lòng chọn xe" }]}
           >
-            <Input placeholder="Nhập tên" className="rounded-md" />
-          </Form.Item>
-
-          <Form.Item
-            label="Số điện thoại"
-            name="phone"
-            rules={[
-              { required: true, message: 'Vui lòng nhập số điện thoại' },
-              {
-                pattern: /^[0-9]{9,11}$/,
-                message: 'Số điện thoại không hợp lệ (9-11 số)',
-              },
-            ]}
-          >
-            <Input placeholder="Nhập số điện thoại" className="rounded-md" />
-          </Form.Item>
-
-          <Form.Item
-            label="Loại xe"
-            name="vehicleType"
-            rules={[{ required: true, message: 'Vui lòng chọn loại xe' }]}
-          >
-            <Select className="rounded-md">
-              <Option value="car">Ô tô</Option>
-              <Option value="motorbike">Xe máy</Option>
-              <Option value="bicycle">Xe đạp</Option>
+            <Select placeholder="Chọn xe của bạn">
+              {vehicles.map((v) => (
+                <Option key={v.id} value={v.id}>
+                  {v.licensePlate} - {v.vehicleType}
+                </Option>
+              ))}
             </Select>
           </Form.Item>
 
           <Form.Item
-            label="Thời gian đặt chỗ"
-            name="timeRange"
-            rules={[
-              { required: true, message: 'Vui lòng chọn thời gian bắt đầu và kết thúc' },
-              {
-                validator: (_, value) => {
-                  if (!value || value.length !== 2) {
-                    return Promise.reject('Vui lòng chọn thời gian đầy đủ');
-                  }
-                  if (value[0].isAfter(value[1])) {
-                    return Promise.reject('Thời gian bắt đầu phải trước thời gian kết thúc');
-                  }
-                  return Promise.resolve();
-                },
-              },
-            ]}
+            label="Chọn chỗ đỗ"
+            name="parkingSlotId"
+            rules={[{ required: true, message: "Vui lòng chọn chỗ đỗ" }]}
           >
-            <DatePicker.RangePicker
-              showTime={{ format: 'HH:mm' }}
+            <Select placeholder="Chọn chỗ đỗ">
+              {slots.map((slot) => (
+                <Option key={slot.id} value={slot.id} disabled={slot.slotStatus !== "FREE"}>
+                  {slot.slotNumber} {slot.slotStatus !== "FREE" ? `(${slot.slotStatus})` : ""}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            label="Thời gian bắt đầu"
+            name="startTime"
+            rules={[{ required: true, message: "Vui lòng chọn thời gian bắt đầu" }]}
+          >
+            <DatePicker
+              showTime={{ format: "HH:mm" }}
               format="DD/MM/YYYY HH:mm"
-              disabledDate={(current) => current && current < moment().startOf('day')}
-              className="w-full rounded-md"
+              disabledDate={(current) => current && current < moment().startOf("day")}
+              className="w-full"
             />
           </Form.Item>
 
+          <Form.Item
+            label="Thời gian kết thúc"
+            name="endTime"
+            dependencies={["startTime"]}
+            rules={[
+              { required: true, message: "Vui lòng chọn thời gian kết thúc" },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || !getFieldValue("startTime")) return Promise.resolve();
+                  if (value.isBefore(getFieldValue("startTime"))) {
+                    return Promise.reject(new Error("Thời gian kết thúc phải sau thời gian bắt đầu"));
+                  }
+                  return Promise.resolve();
+                },
+              }),
+            ]}
+          >
+            <DatePicker
+              showTime={{ format: "HH:mm" }}
+              format="DD/MM/YYYY HH:mm"
+              disabledDate={(current) => current && current < moment().startOf("day")}
+              className="w-full"
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="Phương thức thanh toán"
+            name="paymentMethod"
+            rules={[{ required: true, message: "Vui lòng chọn phương thức" }]}
+          >
+            <Select placeholder="Chọn phương thức">
+              <Option value="MOMO">MOMO</Option>
+              <Option value="VNPAY">VNPAY</Option>
+            </Select>
+          </Form.Item>
+
           <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={submitting}
-              block
-              className="rounded-md bg-green-600 hover:bg-green-700 border-green-600"
-            >
-              Đặt chỗ ngay
+            <Button type="primary" htmlType="submit" loading={submitting} block>
+              Thanh toán
             </Button>
           </Form.Item>
         </Form>

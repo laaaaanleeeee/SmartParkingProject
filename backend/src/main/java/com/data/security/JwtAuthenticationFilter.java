@@ -27,7 +27,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         final String authHeader = request.getHeader("Authorization");
 
-        // Chỉ xử lý khi header có dạng "Bearer xxx"
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
 
@@ -37,7 +36,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     var userDetails = userService.loadUserByUsername(username);
 
-                    // Bạn có thể thêm check: !jwtUtil.isExpired(token)
                     if (!jwtUtil.isExpired(token)) {
                         var auth = new UsernamePasswordAuthenticationToken(
                                 userDetails, null, userDetails.getAuthorities());
@@ -47,7 +45,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
 
             } catch (Exception e) {
-                // Token lỗi → không set auth, để Spring trả 401 ở layer sau
             }
         }
 

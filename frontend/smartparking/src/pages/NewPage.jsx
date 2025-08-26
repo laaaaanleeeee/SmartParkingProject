@@ -3,7 +3,7 @@ import { Button, message, Modal } from "antd";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import { useTheme } from "../hooks/useTheme";
-import { getAllNews, getNewById } from "../services/NewService";
+import { getAllNews, getNewById } from "../services/NewsService";
 import { FloatButton } from 'antd';
 
 const NewsPage = () => {

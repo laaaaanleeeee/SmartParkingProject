@@ -1,6 +1,6 @@
 package com.data.controller;
 
-import com.data.dto.NewsResponseDTO;
+import com.data.dto.response.NewsResponseDTO;
 import com.data.service.NewsService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

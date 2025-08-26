@@ -1,12 +1,9 @@
 package com.data.service;
 
-import com.data.dto.BookingRequestDTO;
-import com.data.dto.BookingResponseDTO;
-import com.data.dto.PageDTO;
-import com.data.entity.Booking;
-import com.data.entity.Pricing;
-import com.data.entity.User;
-import com.data.entity.Voucher;
+import com.data.dto.request.BookingRequestDTO;
+import com.data.dto.response.BookingResponseDTO;
+import com.data.dto.response.PageDTO;
+import com.data.entity.*;
 import com.data.enums.BookingStatus;
 import com.data.repository.*;
 import lombok.AccessLevel;
@@ -18,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +29,7 @@ public class BookingService {
     PricingRepository pricingRepository;
     VoucherRepository voucherRepository;
 
-    public BookingResponseDTO createBooking(BookingRequestDTO dto, String usernameFromJwt) {
+    public BookingResponseDTO createBooking(BookingRequestDTO dto, String username) {
         Booking booking = new Booking();
 
         booking.setStartTime(dto.getStartTime());
@@ -39,8 +37,9 @@ public class BookingService {
         booking.setBookingStatus(BookingStatus.PENDING);
         booking.setCreatedAt(LocalDateTime.now());
         booking.setUpdatedAt(LocalDateTime.now());
+        booking.setExpireAt(LocalDateTime.now().plusMinutes(15));
 
-        User user = userRepository.findByUsername(usernameFromJwt)
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         booking.setUser(user);
 
@@ -48,17 +47,29 @@ public class BookingService {
                 .orElseThrow(() -> new RuntimeException("Parking lot not found")));
         booking.setParkingSlot(slotRepository.findById(dto.getParkingSlotId())
                 .orElseThrow(() -> new RuntimeException("Slot not found")));
-        booking.setVehicle(vehicleRepository.findById(dto.getVehicleId())
-                .orElseThrow(() -> new RuntimeException("Vehicle not found")));
+        Vehicle vehicle = vehicleRepository.findById(dto.getVehicleId())
+                .orElseThrow(() -> new RuntimeException("Vehicle not found"));
+        booking.setVehicle(vehicle);
 
-        Pricing pricing = pricingRepository.findByParkingLot_Id(dto.getParkingLotId())
-                .orElseThrow(() -> new RuntimeException("Pricing not found"));
+        List<Pricing> pricings = pricingRepository.findByParkingLot_IdAndVehicleType(
+                dto.getParkingLotId(),
+                vehicle.getVehicleType()
+        );
+
+        if (pricings.isEmpty()) {
+            throw new RuntimeException("No pricing found for this vehicle type in the selected lot");
+        }
+
+        Pricing pricing = pricings.stream()
+                .filter(p -> (p.getStartTime() == null || !dto.getStartTime().isBefore(p.getStartTime())))
+                .filter(p -> (p.getEndTime() == null || !dto.getEndTime().isAfter(p.getEndTime())))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No valid pricing for this time range"));
+
         booking.setPricing(pricing);
 
         long hours = ChronoUnit.HOURS.between(dto.getStartTime(), dto.getEndTime());
-        if (hours <= 0) {
-            throw new IllegalArgumentException("End time must be after start time");
-        }
+        if (hours <= 0) throw new IllegalArgumentException("End time must be after start time");
 
         double totalPrice = hours * pricing.getPricePerHour();
 
@@ -74,50 +85,36 @@ public class BookingService {
         return new BookingResponseDTO(bookingRepository.save(booking));
     }
 
-    public PageDTO<BookingResponseDTO> getBookingsByUser(Long userId, Pageable pageable) {
-        Page<Booking> bookings = bookingRepository.findByUser_Id(userId, pageable);
-        PageDTO<BookingResponseDTO> pageDTO = new PageDTO<>();
-        pageDTO.setListDTO(bookings.map(BookingResponseDTO::new).getContent());
-        pageDTO.setPage(bookings.getNumber());
-        pageDTO.setTotalPage(bookings.getTotalPages());
-        pageDTO.setSize(bookings.getSize());
-        pageDTO.setNumElement(bookings.getNumberOfElements());
-        pageDTO.setTotalElement(bookings.getTotalElements());
-        pageDTO.setFirst(bookings.isFirst());
-        pageDTO.setLast(bookings.isLast());
 
-        return pageDTO;
+    public void expirePendingBookings() {
+        List<Booking> pendingBookings = bookingRepository.findByBookingStatus(BookingStatus.PENDING);
+        LocalDateTime now = LocalDateTime.now();
+
+        for (Booking booking : pendingBookings) {
+            if (booking.getExpireAt() != null && booking.getExpireAt().isBefore(now)) {
+                booking.setBookingStatus(BookingStatus.CANCELLED);
+                booking.setCancelledAt(now);
+                booking.setCancellationReason("Expired pending booking");
+                bookingRepository.save(booking);
+            }
+        }
     }
 
-    public PageDTO<BookingResponseDTO> getBookingsByParkingLot(Long lotId, Pageable pageable) {
-        Page<Booking> bookings = bookingRepository.findByParkingLot_Id(lotId, pageable);
-        PageDTO<BookingResponseDTO> pageDTO = new PageDTO<>();
-        pageDTO.setListDTO(bookings.map(BookingResponseDTO::new).getContent());
-        pageDTO.setPage(bookings.getNumber());
-        pageDTO.setTotalPage(bookings.getTotalPages());
-        pageDTO.setSize(bookings.getSize());
-        pageDTO.setNumElement(bookings.getNumberOfElements());
-        pageDTO.setTotalElement(bookings.getTotalElements());
-        pageDTO.setFirst(bookings.isFirst());
-        pageDTO.setLast(bookings.isLast());
-
-        return pageDTO;
+    public BookingResponseDTO getBookingById(Long id) {
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+        return new BookingResponseDTO(booking);
     }
 
-    public PageDTO<BookingResponseDTO> getBookingsByStatus(BookingStatus status, Pageable pageable) {
-        Page<Booking> bookings = bookingRepository.findByBookingStatus(status, pageable);
-        PageDTO<BookingResponseDTO> pageDTO = new PageDTO<>();
-        pageDTO.setListDTO(bookings.map(BookingResponseDTO::new).getContent());
-        pageDTO.setPage(bookings.getNumber());
-        pageDTO.setTotalPage(bookings.getTotalPages());
-        pageDTO.setSize(bookings.getSize());
-        pageDTO.setNumElement(bookings.getNumberOfElements());
-        pageDTO.setTotalElement(bookings.getTotalElements());
-        pageDTO.setFirst(bookings.isFirst());
-        pageDTO.setLast(bookings.isLast());
+    public PageDTO<BookingResponseDTO> getBookingsByUser(String username, Pageable pageable) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return pageDTO;
+        Page<Booking> bookings = bookingRepository.findByUser_Id(user.getId(), pageable);
+        return PageDTO.of(bookings.map(BookingResponseDTO::new));
     }
+
+
 
     public BookingResponseDTO cancelBooking(Long id, String reason) {
         Booking booking = bookingRepository.findById(id)
@@ -129,9 +126,26 @@ public class BookingService {
         return new BookingResponseDTO(bookingRepository.save(booking));
     }
 
-    public Long getUserIdByUsername(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        return user.getId();
+    public BookingResponseDTO confirmBooking(Long id) {
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+        if (booking.getBookingStatus() != BookingStatus.PENDING) {
+            throw new RuntimeException("Booking is not in pending state");
+        }
+        booking.setBookingStatus(BookingStatus.CONFIRMED);
+        booking.setUpdatedAt(LocalDateTime.now());
+        return new BookingResponseDTO(bookingRepository.save(booking));
     }
+
+    public BookingResponseDTO completeBooking(Long id) {
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+        if (booking.getBookingStatus() != BookingStatus.CONFIRMED) {
+            throw new RuntimeException("Booking is not confirmed");
+        }
+        booking.setBookingStatus(BookingStatus.COMPLETED);
+        booking.setUpdatedAt(LocalDateTime.now());
+        return new BookingResponseDTO(bookingRepository.save(booking));
+    }
+
 }

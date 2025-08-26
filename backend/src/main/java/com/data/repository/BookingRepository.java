@@ -5,8 +5,6 @@ import com.data.enums.BookingStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -16,14 +14,9 @@ import java.util.List;
 public interface BookingRepository extends JpaRepository<Booking, Long> {
     Page<Booking> findByUser_Id(Long userId, Pageable pageable);
 
-    Page<Booking> findByBookingStatus(BookingStatus bookingStatus, Pageable pageable);
+    List<Booking> findByParkingLot_Id(Long lotId);
 
-    @Query("select b from Booking b where b.startTime >= :start and b.endTime <= :end")
-    Page<Booking> findByDateRange(@Param("start") LocalDateTime start,
-                                  @Param("end") LocalDateTime end,
-                                  Pageable pageable);
+    List<Booking> findByBookingStatus(BookingStatus status);
 
-    Page<Booking> findByParkingLot_Id(Long parkingLotId, Pageable pageable);
-
-    List<Booking> findByParkingSlot_Id(Long slotId);
+    List<Booking> findByExpireAtBeforeAndBookingStatus(LocalDateTime now, BookingStatus status);
 }

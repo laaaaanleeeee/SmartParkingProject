@@ -1,6 +1,6 @@
 package com.data.service;
 
-import com.data.dto.*;
+import com.data.dto.response.*;
 import com.data.entity.Image;
 import com.data.entity.ParkingLot;
 import com.data.entity.Pricing;

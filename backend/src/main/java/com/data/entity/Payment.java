@@ -28,7 +28,7 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     PaymentMethod paymentMethod;
 
-    @Column(name = "payment_time", nullable = false)
+    @Column(name = "payment_time")
     LocalDateTime paymentTime;
 
     @Enumerated(EnumType.STRING)
