@@ -4,11 +4,11 @@ import Footer from '../components/Footer';
 import WrapperTheme from "../components/WrapperTheme";
 
 
-const MainLayout = () => {
+const MainLayout = () => {  
   return (
     <WrapperTheme>
         <Header/>
-        <main className='mt-15'>
+        <main className="pt-16">
             <Outlet />
         </main>
         <Footer />

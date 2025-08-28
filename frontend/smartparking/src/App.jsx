@@ -14,9 +14,10 @@ import HistoryBookingPage from './pages/HistoryBookingPage';
 import TechnologyPage from './pages/TechnologyPage';
 import SigninPage from './pages/SigninPage';
 import SignupPage from './pages/SignupPage';
-import PrivateRoute from './routes/PrivateRoute.jsx'
-import RoleBasedLayout from './layout/RoleBasedLayout.jsx'
-import PaymentPage from './pages/PaymentPage.jsx'
+import PrivateRoute from './routes/PrivateRoute.jsx';
+import RoleBasedLayout from './layout/RoleBasedLayout.jsx';
+import PaymentPage from './pages/PaymentPage.jsx';
+import SolutionPage from './pages/SolutionPage.jsx'
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
         <Route path='/' element={<HomePage />} />
         <Route path='/parking-lots' element={<ParkingLotPage />}></Route>
         <Route path='/news' element={<NewPage />}></Route>
+        <Route path='/solutions' element={<SolutionPage />}></Route>
         <Route path='/contact' element={<ContactPage />}></Route>
         <Route path='/parking-lots/:id/booking' element={<PrivateRoute><BookingPage /></PrivateRoute>}></Route>
         <Route path='/parking-lots/:id' element={<ParkingLotDetailPage />}></Route>

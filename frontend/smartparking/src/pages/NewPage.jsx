@@ -45,7 +45,7 @@ const NewsPage = () => {
 
     return (
         <div className="max-w-5xl mx-auto p-6">
-            <h2 className={`text-3xl font-bold mb-6 ${isDark ? "text-white" : "text-green-600"}`}>
+            <h2 className={`text-3xl text-center font-bold mb-6 ${isDark ? "text-white" : "text-green-600"}`}>
                 Tin tức mới nhất
             </h2>
 
