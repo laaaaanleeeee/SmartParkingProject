@@ -1,5 +1,6 @@
 package com.data.entity;
 
+import com.data.enums.UserGender;
 import com.data.enums.UserRole;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -38,9 +39,16 @@ public class User implements UserDetails {
     @Column(unique = true, length = 15)
     String phone;
 
+    @Temporal(TemporalType.DATE)
+    Date dob;
+
+    @Enumerated(EnumType.STRING)
+    UserGender userGender;
+
     @Column(name = "created_at")
     LocalDateTime createdAt;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     UserRole userRole;
 

@@ -21,7 +21,7 @@ public class Vehicle {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @Column(name = "license_plate", nullable = false, unique = true, length = 100)
+    @Column(name = "license_plate", nullable = false, unique = true, length = 20)
     String licensePlate;
 
     @Enumerated(EnumType.STRING)

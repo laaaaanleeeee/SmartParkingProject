@@ -1,149 +1,151 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { getParkingLotDetail } from '../services/ParkingLotService';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { getParkingLotDetail } from "../services/ParkingLotService";
+import { useTheme } from "../hooks/useTheme";
+import { Carousel } from "antd";
 import {
-  Row, Col, Card, Descriptions, List, Button, Typography, Tag, Divider,
-  message,
-} from 'antd';
-import {
-  EnvironmentOutlined,
-  DollarCircleOutlined,
-  StarOutlined,
-  ArrowRightOutlined,
-} from '@ant-design/icons';
-
-const { Title, Text } = Typography;
+  MapPin,
+  DollarSign,
+  Star,
+  ArrowRight,
+  Car,
+} from "lucide-react";
+import { FloatButton } from 'antd';
 
 const ParkingLotDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { theme } = useTheme();
   const [parkingLot, setParkingLot] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const textClass1 = theme === "dark" ? "text-gray-100" : "text-gray-900";
+  const textClass2 = theme === "dark" ? "text-gray-400" : "text-gray-600";
+  const bgMain = theme === "dark" ? "bg-gray-950" : "bg-gray-100";
+  const bgCard = theme === "dark" ? "bg-gray-900" : "bg-white";
+  const borderClass = theme === "dark" ? "border-gray-700" : "border-gray-200";
 
   useEffect(() => {
     const fetchParkingLot = async () => {
       try {
         const res = await getParkingLotDetail(id);
         setParkingLot(res.data);
-      } catch (err) {
-        message.error(err);
-        setError('Không thể tải dữ liệu');
+      } catch {
+        setError("Không thể tải dữ liệu");
       } finally {
         setLoading(false);
       }
     };
-
     fetchParkingLot();
   }, [id]);
 
-  if (loading) return <div style={{ padding: 40, textAlign: 'center' }}>Đang tải...</div>;
-  if (error) return <div style={{ padding: 40, color: 'red', textAlign: 'center' }}>{error}</div>;
-  if (!parkingLot) return <div style={{ padding: 40, textAlign: 'center' }}>Không tìm thấy bãi đỗ</div>;
+  if (loading) return <div className={`p-10 text-center ${textClass2}`}>Đang tải...</div>;
+  if (error) return <div className={`p-10 text-center text-red-500`}>{error}</div>;
+  if (!parkingLot) return <div className={`p-10 text-center ${textClass2}`}>Không tìm thấy bãi đỗ</div>;
 
   const mapSrc = `https://www.google.com/maps?q=${parkingLot.latitude},${parkingLot.longitude}&hl=vi&z=16&output=embed`;
 
-  const statusColor = parkingLot.parkingLotStatus === 'OPEN' ? 'green' : 'red';
-
   return (
-    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '32px' }}>
-      <Row gutter={[24, 24]}>
-        <Col xs={24} md={14}>
-          <Card
-            title={
-              <div className="flex-between">
-                <Title level={4} style={{ marginBottom: 0, color: '#389e0d' }}>
-                  {parkingLot.name}
-                </Title>
+    <div className={`min-h-screen ${bgMain} p-6`}>
+      {parkingLot.images?.length > 0 && (
+        <div className={`${bgCard} rounded-xl shadow mb-6 overflow-hidden`}>
+          <Carousel autoplay dots className="w-full h-80">
+            {parkingLot.images.map((img) => (
+              <div key={img.id} className="w-full h-80">
+                <img
+                  src={img.url}
+                  alt="Parking lot"
+                  className="w-full h-80 object-cover"
+                />
               </div>
-            }
-            style={{ backgroundColor: '#f6ffed', borderRadius: 8 }}
-          >
-            <Descriptions column={1} layout="vertical" colon={false}>
-              <Descriptions.Item label={<Text strong>Địa chỉ</Text>}>
-                <EnvironmentOutlined /> {parkingLot.address}, {parkingLot.ward}, {parkingLot.city}
-              </Descriptions.Item>
-              <Descriptions.Item label={<Text strong>Số chỗ</Text>}>
-                <Tag color="green">{parkingLot.availableSlots}</Tag> /
-                <Tag>{parkingLot.totalSlots}</Tag>
-              </Descriptions.Item>
-              <Descriptions.Item label={<Text strong>Trạng thái</Text>}>
-                <Tag color={statusColor}>{parkingLot.parkingLotStatus}</Tag>
-              </Descriptions.Item>
-              <Descriptions.Item label={<Text strong>Mô tả</Text>}>
-                {parkingLot.description}
-              </Descriptions.Item>
-            </Descriptions>
+            ))}
+          </Carousel>
+        </div>
+      )}
 
-            <Divider />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className={`md:col-span-2 ${bgCard} rounded-xl shadow p-6`}>
+          <h2 className={`text-2xl font-semibold mb-4 ${textClass1}`}>
+            {parkingLot.name}
+          </h2>
 
-            <Title level={5} style={{ color: '#52c41a' }}>
-              <DollarCircleOutlined /> Giá theo giờ
-            </Title>
-            <List
-              size="small"
-              bordered
-              dataSource={parkingLot.pricings}
-              renderItem={item => (
-                <List.Item>
-                  <b>{item.vehicleType}</b>: {item.pricePerHour} VNĐ/giờ
-                  {item.startTime && ` (từ ${item.startTime} đến ${item.endTime})`}
-                </List.Item>
-              )}
-              style={{ marginBottom: 24 }}
-            />
-
-            <Title level={5} style={{ color: '#52c41a' }}>
-              <StarOutlined /> Đánh giá
-            </Title>
-            <List
-              size="small"
-              bordered
-              dataSource={parkingLot.reviews}
-              renderItem={review => (
-                <List.Item>
-                  <div>
-                    ⭐ {review.rating} — "{review.comment}" – <i>{review.user.name}</i>
-                  </div>
-                </List.Item>
-              )}
-            />
-          </Card>
-        </Col>
-
-        <Col xs={24} md={10}>
-          <Card
-            title={<span style={{ color: '#52c41a' }}>Bản đồ</span>}
-            style={{ borderRadius: 8 }}
-          >
-            <div style={{ width: '100%', height: 400, overflow: 'hidden', borderRadius: 8 }}>
-              <iframe
-                src={mapSrc}
-                title="Bản đồ"
-                width="100%"
-                height="100%"
-                allowFullScreen
-              ></iframe>
-            </div>
-          </Card>
-
-          <div style={{ textAlign: 'center', marginTop: 24 }}>
-            <Button
-              type="primary"
-              size="large"
-              icon={<ArrowRightOutlined />}
-              onClick={() => navigate(`/parking-lots/${parkingLot.id}/booking`, { state: { parkingLot } })}
-              style={{
-                backgroundColor: '#52c41a',
-                borderColor: '#52c41a',
-                borderRadius: 6,
-              }}
-            >
-              Đặt chỗ ngay
-            </Button>
+          <div className={`space-y-3 ${textClass2}`}>
+            <p><MapPin className="inline w-5 h-5 mr-2 text-green-500" /> 
+              {parkingLot.address}, {parkingLot.ward}, {parkingLot.city}
+            </p>
+            <p>
+              <Car className="inline w-5 h-5 mr-2 text-green-500" /> 
+              Số chỗ: 
+              <span className="ml-2 text-green-500 font-semibold">{parkingLot.availableSlots}</span> / {parkingLot.totalSlots}
+            </p>
+            <p>
+              <span className="font-medium">Trạng thái:</span>{" "}
+              <span className={`px-2 py-1 rounded text-sm font-semibold ${
+                parkingLot.parkingLotStatus === "ACTIVE" ? "bg-green-500 text-white" : "bg-red-500 text-white"
+              }`}>
+                {parkingLot.parkingLotStatus}
+              </span>
+            </p>
+            <p><span className="font-medium">Mô tả:</span> {parkingLot.description}</p>
           </div>
-        </Col>
-      </Row>
+
+          <div className="mt-6">
+            <h3 className={`text-lg font-semibold mb-2 flex items-center gap-2 ${textClass1}`}>
+              <DollarSign className="w-5 h-5 text-green-500" /> Giá theo giờ
+            </h3>
+            <ul className={`space-y-2 border rounded-lg p-4 ${borderClass}`}>
+              {parkingLot.pricings.map((item) => (
+                <li key={item.id} className={`${textClass2}`}>
+                  <b>{item.vehicleType}</b>: {item.pricePerHour} VNĐ/giờ
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="mt-6">
+            <h3 className={`text-lg font-semibold mb-2 flex items-center gap-2 ${textClass1}`}>
+              <Star className="w-5 h-5 text-green-500" /> Đánh giá
+            </h3>
+            <ul className={`space-y-2 border rounded-lg p-4 ${borderClass}`}>
+              {parkingLot.reviews?.length > 0 ? (
+                parkingLot.reviews.map((review) => (
+                  <li key={review.id} className={`${textClass2}`}>
+                    ⭐ {review.rating} — "{review.comment}" – <i>{review.user.fullName}</i>
+                  </li>
+                ))
+              ) : (
+                <p className={textClass2}>Chưa có đánh giá nào</p>
+              )}
+            </ul>
+          </div>
+        </div>
+
+        <div className={`${bgCard} rounded-xl shadow p-6`}>
+          <h3 className={`text-lg font-semibold mb-3 ${textClass1}`}>Bản đồ</h3>
+          <div className="w-full h-64 rounded-lg overflow-hidden mb-4">
+            <iframe
+              src={mapSrc}
+              title="Bản đồ"
+              width="100%"
+              height="100%"
+              allowFullScreen
+            ></iframe>
+          </div>
+
+          <button
+            onClick={() =>
+              navigate(`/parking-lots/${parkingLot.id}/booking`, {
+                state: { parkingLot },
+              })
+            }
+            className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition"
+          >
+            <ArrowRight className="w-5 h-5" /> Đặt chỗ ngay
+          </button>
+        </div>
+      </div>
+      <FloatButton.BackTop />
     </div>
   );
 };

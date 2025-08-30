@@ -1,4 +1,5 @@
 import React from "react";
+import { FloatButton } from 'antd';
 
 const ContactPage = () => {
   return (
@@ -70,6 +71,7 @@ const ContactPage = () => {
             </button>
           </form>
         </div>
+        <FloatButton.BackTop />
     </div>
   );
 };

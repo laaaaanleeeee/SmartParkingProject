@@ -1,7 +1,6 @@
 import React from "react";
 
 const HistoryBookingPage = () => {
-  // dữ liệu mẫu
   const historyData = [
     {
       id: 1,

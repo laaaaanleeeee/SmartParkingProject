@@ -38,7 +38,7 @@ function App() {
         <Route path='/subcription' element={<SubcriptionPage />}></Route>
         <Route path='/history_booking' element={<PrivateRoute><HistoryBookingPage /></PrivateRoute>}></Route>
         <Route path='/technologies' element={<TechnologyPage />}></Route>
-        <Route path='payment/:id' element={<PrivateRoute><PaymentPage /></PrivateRoute>} />
+        <Route path='/payment/:id' element={<PrivateRoute><PaymentPage /></PrivateRoute>} />
       </Route>
     </Routes>
   )

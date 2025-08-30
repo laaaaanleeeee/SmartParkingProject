@@ -30,7 +30,7 @@ const SignupPage = () => {
     onSubmit: async (values) => {
       await register(values);
       openNotification();
-      navigate("/login");
+      navigate("/sign-in");
     },
   });
 
@@ -116,7 +116,7 @@ const SignupPage = () => {
             </button>
           </form>
 
-          <NavLink to="/login">
+          <NavLink to="/sign-in">
             <p className="text-center mt-5 text-blue-600 hover:underline">Đã có tài khoản? Đăng nhập</p>
           </NavLink>
         </div>

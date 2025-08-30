@@ -1,16 +1,27 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Card, Input, Select, Slider, Rate, message, Pagination } from 'antd';
+import { Input, Select, Slider, Rate, message, Pagination } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../hooks/useTheme';
 import { getAllParkingLot } from '../services/ParkingLotService';
 import ImgBg1 from '../assets/errorImg.jpg';
 import axios from 'axios';
+import { FloatButton } from 'antd';
 
 const { Option } = Select;
 
 const ParkingLotPage = () => {
     const { theme } = useTheme();
-    const bgClass = theme === 'dark' ? 'bg-gray-600 text-white' : 'bg-white text-black';
+    const navigate = useNavigate();
+    const textClass = theme === 'dark' ? 'text-gray-100' : 'text-gray-900';
+    const cardClass =
+        theme === 'dark'
+            ? 'bg-gray-900 text-gray-100 border border-gray-700'
+            : 'bg-white text-gray-900 border border-gray-200';
+    const filterClass =
+        theme === 'dark'
+            ? 'bg-gray-800 text-gray-100 border border-gray-700'
+            : 'bg-white text-gray-900 border border-gray-200';
+
     const [cities, setCities] = useState([]);
     const [wards, setWards] = useState([]);
     const [parkingLots, setParkingLots] = useState([]);
@@ -31,7 +42,6 @@ const ParkingLotPage = () => {
         minRating: null,
         minSlots: null,
     });
-    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchCityandWard = async () => {
@@ -105,22 +115,25 @@ const ParkingLotPage = () => {
     };
 
     return (
-        <div className="max-w-5xl mx-auto p-6">
-            <h2 className="text-3xl font-bold text-center mb-6">Danh sách bãi đỗ xe</h2>
+        <div className="max-w-6xl mx-auto p-6">
+            <h2 className={`text-3xl font-bold text-center mb-6 ${textClass}`}>
+                Danh sách bãi đỗ xe
+            </h2>
 
-            <div className="mb-6 p-4 bg-gray-100 rounded-lg">
+            <div className={`mb-6 p-4 rounded-xl shadow ${cardClass}`}>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <Input
                         placeholder="Tìm kiếm theo tên bãi đỗ"
                         value={filters.name}
                         onChange={(e) => handleFilterChange('name', e.target.value)}
+                        className={filterClass}
                     />
                     <Select
                         placeholder="Chọn thành phố"
                         allowClear
                         value={filters.city}
                         onChange={handleCityChange}
-                        className="w-full"
+                        className={`w-full ${filterClass}`}
                         showSearch
                         optionFilterProp="children"
                         filterOption={(input, option) =>
@@ -138,7 +151,7 @@ const ParkingLotPage = () => {
                         allowClear
                         value={filters.ward}
                         onChange={handleWardChange}
-                        className="w-full"
+                        className={`w-full ${filterClass}`}
                         disabled={!filters.city}
                         showSearch
                         optionFilterProp="children"
@@ -157,7 +170,7 @@ const ParkingLotPage = () => {
                         allowClear
                         value={filters.minRating}
                         onChange={(value) => handleFilterChange('minRating', value || null)}
-                        className="w-full"
+                        className={`w-full ${filterClass}`}
                     >
                         <Option value={1}>1 sao</Option>
                         <Option value={2}>2 sao</Option>
@@ -165,8 +178,8 @@ const ParkingLotPage = () => {
                         <Option value={4}>4 sao</Option>
                         <Option value={5}>5 sao</Option>
                     </Select>
-                    <div>
-                        <label>Khoảng giá (VNĐ/giờ):</label>
+                    <div className={filterClass + " p-2 rounded"}>
+                        <label className="block text-xs mb-1">Khoảng giá (VNĐ/giờ):</label>
                         <Slider
                             range
                             min={0}
@@ -181,14 +194,17 @@ const ParkingLotPage = () => {
                                 }))
                             }
                         />
-
                     </div>
                     <Input
                         type="number"
                         placeholder="Số chỗ trống tối thiểu"
                         onChange={(e) =>
-                            handleFilterChange('minSlots', e.target.value ? Number(e.target.value) : null)
+                            handleFilterChange(
+                                'minSlots',
+                                e.target.value ? Number(e.target.value) : null
+                            )
                         }
+                        className={filterClass}
                     />
                 </div>
             </div>
@@ -198,41 +214,39 @@ const ParkingLotPage = () => {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {parkingLots.map((lot) => (
-                        <Card
+                        <div
                             key={lot.id}
-                            hoverable
-                            cover={
-                                <img
-                                    alt={lot.name}
-                                    src={lot.images.length > 0 ? lot.images[0].url : ImgBg1}
-                                    className="h-48 object-cover"
-                                />
-                            }
-                            className={bgClass}
+                            className={`rounded-xl shadow-lg overflow-hidden ${cardClass} transition transform hover:scale-105`}
                         >
+                            <img
+                                alt={lot.name}
+                                src={lot.images.length > 0 ? lot.images[0].url : ImgBg1}
+                                className="h-48 w-full object-cover"
+                            />
                             <div className="p-4">
                                 <h3 className="text-xl font-semibold">{lot.name}</h3>
                                 <p className="text-sm">{lot.address}</p>
-                                <div className="text-sm mt-2">
+                                <div className="flex items-center mt-2 text-sm">
                                     <Rate disabled allowHalf value={getAverageRating(lot.reviews)} />
-                                    <span> ({lot.reviews.length} đánh giá)</span>
+                                    <span className="ml-1">({lot.reviews.length} đánh giá)</span>
                                 </div>
-                                <p className="text-sm">Giá: {getMinPrice(lot.pricings)}</p>
-                                <p className="text-sm">Số chỗ trống: {lot.availableSlots}/{lot.totalSlots}</p>
-                                <Button
-                                    type="primary"
-                                    className="mt-4"
+                                <p className="text-sm mt-1">Giá: {getMinPrice(lot.pricings)}</p>
+                                <p className="text-sm">
+                                    Số chỗ trống: {lot.availableSlots}/{lot.totalSlots}
+                                </p>
+                                <button
                                     onClick={() => navigate(`/parking-lots/${lot.id}`)}
+                                    className="mt-4 w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
                                 >
                                     Xem chi tiết
-                                </Button>
+                                </button>
                             </div>
-                        </Card>
+                        </div>
                     ))}
                 </div>
             )}
 
-            <div className="mt-6 text-center">
+            <div className="mt-6 flex justify-center">
                 <Pagination
                     current={pagination.page + 1}
                     total={pagination.totalElement}
@@ -241,6 +255,8 @@ const ParkingLotPage = () => {
                     showSizeChanger={false}
                 />
             </div>
+
+            <FloatButton.BackTop />
         </div>
     );
 };

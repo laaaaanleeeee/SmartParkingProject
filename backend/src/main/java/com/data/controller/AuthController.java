@@ -1,6 +1,7 @@
 package com.data.controller;
 
 import com.data.dto.request.LoginRequest;
+import com.data.dto.request.UpdateUserRequest;
 import com.data.dto.response.UserResponseDTO;
 import com.data.dto.response.AuthResponse;
 import com.data.entity.User;
@@ -78,5 +79,27 @@ public class AuthController {
         }
         User user = (User) authentication.getPrincipal();
         return ResponseEntity.ok(new UserResponseDTO(user));
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<UserResponseDTO> updateUser(
+            @RequestBody UpdateUserRequest request,
+            Authentication authentication
+    ) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).build();
+        }
+
+        User user = (User) authentication.getPrincipal();
+
+        user.setFullName(request.getFullName());
+        user.setEmail(request.getEmail());
+        user.setPhone(request.getPhone());
+        user.setDob(request.getDob());
+        user.setUserGender(request.getUserGender());
+
+        User updated = userService.saveUser(user);
+
+        return ResponseEntity.ok(new UserResponseDTO(updated));
     }
 }

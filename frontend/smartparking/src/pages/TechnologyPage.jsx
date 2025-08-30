@@ -2,11 +2,11 @@ import React from "react";
 import { Tag } from "antd";
 import Atropos from "atropos/react";
 import { useTheme } from "../hooks/useTheme";
-
 import Img1 from "../assets/camera.jpg";
 import Img2 from "../assets/barrier.png";
 import Img3 from "../assets/ovs.jpg";
 import Img4 from "../assets/webapp.jpg";
+import { FloatButton } from 'antd';
 
 const technologies = [
   {
@@ -94,9 +94,6 @@ const TechnologyPage = () => {
                   className="rounded-xl w-full h-80 object-cover"
                 />
               </Atropos>
-              <span className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 bg-green-600 text-white text-sm px-4 py-1 rounded-full shadow-lg">
-                {tech.title.split(" ")[0]}
-              </span>
             </div>
 
             <div className={`md:w-1/2 space-y-6 ${textClass}`}>
@@ -128,6 +125,7 @@ const TechnologyPage = () => {
           </div>
         ))}
       </div>
+      <FloatButton.BackTop />
     </section>
   );
 };

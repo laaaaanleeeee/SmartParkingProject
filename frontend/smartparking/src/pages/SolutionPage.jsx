@@ -1,6 +1,7 @@
 import React from "react";
 import { Tag } from "antd";
 import { useTheme } from "../hooks/useTheme";
+import { FloatButton } from 'antd';
 
 const solutions = [
   {
@@ -177,6 +178,7 @@ const SolutionPage = () => {
           ))}
         </div>
       </div>
+      <FloatButton.BackTop />
     </section>
   );
 };

@@ -7,6 +7,7 @@ import HowItWorks from '../components/HowItWorks';
 import SystemSimulation from '../components/SystemSimulation';
 import NewsEvents from '../components/NewsEvents';
 import CallToAction from '../components/CallToAction';
+import { FloatButton } from 'antd';
 
 const HomePage = () => {
   return (
@@ -19,6 +20,7 @@ const HomePage = () => {
       <SystemSimulation />
       <NewsEvents />
       <CallToAction />
+      <FloatButton.BackTop />
     </div>
   );
 };

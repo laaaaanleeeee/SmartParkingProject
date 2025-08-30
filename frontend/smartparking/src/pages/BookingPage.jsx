@@ -4,31 +4,29 @@ import { getParkingLotDetail } from "../services/ParkingLotService";
 import { getMyVehicles } from "../services/VehicleService";
 import { getSlotByParkingLotId } from "../services/SlotService";
 import { createBooking } from "../services/BookingService";
-import {
-  Form,
-  Button,
-  DatePicker,
-  Select,
-  Card,
-  Typography,
-  message,
-  Spin,
-} from "antd";
+import { Form, Button, DatePicker, Select, message, Spin } from "antd";
+import { Car, MapPin } from "lucide-react";
 import moment from "moment";
+import { useTheme } from "../hooks/useTheme";
 
-const { Title, Text } = Typography;
 const { Option } = Select;
 
 const BookingPage = () => {
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
+  const { theme } = useTheme();
 
   const [parkingLot, setParkingLot] = useState(location.state?.parkingLot || null);
   const [vehicles, setVehicles] = useState([]);
   const [slots, setSlots] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+
+  const textClass1 = theme === "dark" ? "text-gray-100" : "text-gray-900";
+  const textClass2 = theme === "dark" ? "text-gray-400" : "text-gray-600";
+  const bgMain = theme === "dark" ? "bg-gray-950" : "bg-gray-100";
+  const bgCard = theme === "dark" ? "bg-gray-900" : "bg-white";
 
   useEffect(() => {
     const fetchData = async () => {
@@ -68,7 +66,9 @@ const BookingPage = () => {
     try {
       const res = await createBooking(bookingData);
       message.success("Đặt chỗ thành công, vui lòng thanh toán!");
-      navigate(`/payment/${res.data.id}`, { state: { booking: res.data, method: values.paymentMethod } });
+      navigate(`/payment/${res.data.id}`, {
+        state: { booking: res.data, method: values.paymentMethod },
+      });
     } catch (error) {
       console.error(error);
       message.error(error.response?.data?.message || "Đặt chỗ thất bại");
@@ -77,21 +77,34 @@ const BookingPage = () => {
     }
   };
 
-  if (loading) return <Spin size="large" className="mt-24 mx-auto block" />;
-  if (!parkingLot) return <div className="py-20 text-center text-red-500">Không tìm thấy bãi đỗ</div>;
+  if (loading)
+    return (
+      <div className={`flex justify-center items-center min-h-screen ${bgMain}`}>
+        <Spin size="large" />
+      </div>
+    );
+
+  if (!parkingLot)
+    return (
+      <div className={`py-20 text-center text-red-500 ${bgMain}`}>
+        Không tìm thấy bãi đỗ
+      </div>
+    );
 
   return (
-    <div className="max-w-md mx-auto p-6">
-      <Card className="rounded-lg shadow-lg">
-        <Title level={3}>Đặt chỗ cho bãi đỗ: {parkingLot.name}</Title>
+    <div className={`min-h-screen ${bgMain} flex justify-center items-start p-6`}>
+      <div className={`w-full max-w-2xl ${bgCard} rounded-2xl shadow-lg p-8`}>
+        <h2 className={`text-2xl font-semibold mb-2 flex items-center gap-2 ${textClass1}`}>
+          <Car className="w-6 h-6 text-green-500" /> Đặt chỗ cho bãi đỗ
+        </h2>
+        <p className={`mb-6 flex items-center gap-2 ${textClass2}`}>
+          <MapPin className="w-5 h-5 text-green-500" />
+          {parkingLot.address}, {parkingLot.ward}, {parkingLot.city}
+        </p>
 
-        <Text type="secondary" className="block mb-6">
-          Địa chỉ: {parkingLot.address}, {parkingLot.ward}, {parkingLot.city}
-        </Text>
-
-        <Form layout="vertical" onFinish={onFinish}>
+        <Form layout="vertical" onFinish={onFinish} className="space-y-4">
           <Form.Item
-            label="Chọn xe"
+            label={<span className={textClass1}>Chọn xe</span>}
             name="vehicleId"
             rules={[{ required: true, message: "Vui lòng chọn xe" }]}
           >
@@ -105,21 +118,26 @@ const BookingPage = () => {
           </Form.Item>
 
           <Form.Item
-            label="Chọn chỗ đỗ"
+            label={<span className={textClass1}>Chọn chỗ đỗ</span>}
             name="parkingSlotId"
             rules={[{ required: true, message: "Vui lòng chọn chỗ đỗ" }]}
           >
-            <Select placeholder="Chọn chỗ đỗ">
+            <Select placeholder="Chọn khu đỗ">
               {slots.map((slot) => (
-                <Option key={slot.id} value={slot.id} disabled={slot.slotStatus !== "FREE"}>
-                  {slot.slotNumber} {slot.slotStatus !== "FREE" ? `(${slot.slotStatus})` : ""}
+                <Option
+                  key={slot.id}
+                  value={slot.id}
+                  disabled={slot.slotStatus !== "FREE"}
+                >
+                  {slot.slotNumber}{" "}
+                  {slot.slotStatus !== "FREE" ? `(${slot.slotStatus})` : ""}
                 </Option>
               ))}
             </Select>
           </Form.Item>
 
           <Form.Item
-            label="Thời gian bắt đầu"
+            label={<span className={textClass1}>Thời gian bắt đầu</span>}
             name="startTime"
             rules={[{ required: true, message: "Vui lòng chọn thời gian bắt đầu" }]}
           >
@@ -132,7 +150,7 @@ const BookingPage = () => {
           </Form.Item>
 
           <Form.Item
-            label="Thời gian kết thúc"
+            label={<span className={textClass1}>Thời gian kết thúc</span>}
             name="endTime"
             dependencies={["startTime"]}
             rules={[
@@ -141,7 +159,9 @@ const BookingPage = () => {
                 validator(_, value) {
                   if (!value || !getFieldValue("startTime")) return Promise.resolve();
                   if (value.isBefore(getFieldValue("startTime"))) {
-                    return Promise.reject(new Error("Thời gian kết thúc phải sau thời gian bắt đầu"));
+                    return Promise.reject(
+                      new Error("Thời gian kết thúc phải sau thời gian bắt đầu")
+                    );
                   }
                   return Promise.resolve();
                 },
@@ -157,7 +177,7 @@ const BookingPage = () => {
           </Form.Item>
 
           <Form.Item
-            label="Phương thức thanh toán"
+            label={<span className={textClass1}>Phương thức thanh toán</span>}
             name="paymentMethod"
             rules={[{ required: true, message: "Vui lòng chọn phương thức" }]}
           >
@@ -168,12 +188,18 @@ const BookingPage = () => {
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit" loading={submitting} block>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={submitting}
+              block
+              className="bg-green-500 hover:bg-green-600"
+            >
               Thanh toán
             </Button>
           </Form.Item>
         </Form>
-      </Card>
+      </div>
     </div>
   );
 };
