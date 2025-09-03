@@ -17,7 +17,12 @@ import SignupPage from './pages/SignupPage';
 import PrivateRoute from './routes/PrivateRoute.jsx';
 import RoleBasedLayout from './layout/RoleBasedLayout.jsx';
 import PaymentPage from './pages/PaymentPage.jsx';
-import SolutionPage from './pages/SolutionPage.jsx'
+import SolutionPage from './pages/SolutionPage.jsx';
+import ManageParkingLots from './pages/admin/ManageParkingLots.jsx';
+import ManageUser from './pages/admin/ManageUser.jsx';
+import ManageBooking from './pages/admin/ManageBooking.jsx';
+import ManageNews from './pages/admin/ManageNews.jsx';
+import ManageSensor from './pages/admin/ManageSensor.jsx';
 
 function App() {
   return (
@@ -39,6 +44,14 @@ function App() {
         <Route path='/history_booking' element={<PrivateRoute><HistoryBookingPage /></PrivateRoute>}></Route>
         <Route path='/technologies' element={<TechnologyPage />}></Route>
         <Route path='/payment/:id' element={<PrivateRoute><PaymentPage /></PrivateRoute>} />
+
+        <Route path='admin'>
+          <Route path='manage-parking-lots' element={<ManageParkingLots />} />
+          <Route path='manage-users' element={<ManageUser />} />
+          <Route path='manage-bookings' element={<ManageBooking />} />
+          <Route path='manage-news' element={<ManageNews />} />
+          <Route path='manage-sensors' element={<ManageSensor />} />
+        </Route>
       </Route>
     </Routes>
   )

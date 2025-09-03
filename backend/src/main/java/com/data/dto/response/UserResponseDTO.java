@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Data
@@ -19,7 +20,7 @@ public class UserResponseDTO {
      String phone;
      String createdAt;
      UserRole userRole;
-     Date dob;
+     LocalDate dob;
      UserGender userGender;
 
     public UserResponseDTO(User user) {

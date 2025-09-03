@@ -88,7 +88,7 @@ const SigninPage = () => {
             </button>
           </form>
 
-          <NavLink to="/signup">
+          <NavLink to="/sign-up">
             <p className="text-center mt-5 text-blue-600 hover:underline">Đăng ký ngay</p>
           </NavLink>
         </div>

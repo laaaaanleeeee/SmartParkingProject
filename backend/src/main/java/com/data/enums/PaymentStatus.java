@@ -1,5 +1,5 @@
 package com.data.enums;
 
 public enum PaymentStatus {
-    PENDING,PAID,FAILED
+    PENDING, PAID, FAILED, REFUNDED
 }

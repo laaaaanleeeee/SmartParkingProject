@@ -22,17 +22,19 @@ public class BookingController {
     @PostMapping
     public ResponseEntity<BookingResponseDTO> createBooking(
             @RequestBody BookingRequestDTO dto,
-            Authentication authentication) {
-        String username = authentication.getName();
-        return ResponseEntity.ok(bookingService.createBooking(dto, username));
+            Authentication auth) {
+        return ResponseEntity.ok(
+                bookingService.createBooking(dto, auth.getName())
+        );
     }
 
     @GetMapping("/me")
     public ResponseEntity<PageDTO<BookingResponseDTO>> getMyBookings(
             Pageable pageable,
-            Authentication authentication) {
-        String username = authentication.getName();
-        return ResponseEntity.ok(bookingService.getBookingsByUser(username, pageable));
+            Authentication auth) {
+        return ResponseEntity.ok(
+                bookingService.getBookingsByUser(auth.getName(), pageable)
+        );
     }
 
     @GetMapping("/{id}")
@@ -43,8 +45,11 @@ public class BookingController {
     @PutMapping("/{id}/cancel")
     public ResponseEntity<BookingResponseDTO> cancelBooking(
             @PathVariable Long id,
-            @RequestParam String reason) {
-        return ResponseEntity.ok(bookingService.cancelBooking(id, reason));
+            @RequestParam String reason,
+            Authentication auth) {
+        return ResponseEntity.ok(
+                bookingService.cancelBooking(id, reason, auth.getName())
+        );
     }
 
     @PutMapping("/{id}/confirm")

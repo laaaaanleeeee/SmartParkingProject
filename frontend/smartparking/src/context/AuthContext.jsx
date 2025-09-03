@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect } from "react";
 import { message } from "antd";
 import api from "../api/axiosInstance";
+import { useNavigate } from "react-router-dom";
 
 export const AuthContext = createContext();
 
@@ -9,6 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [role, setRole] = useState(localStorage.getItem("userRole") || null);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const login = async (username, password) => {
     try {
@@ -49,6 +51,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("userRole");
     message.success("Đã đăng xuất.");
+    navigate("/sign-in");
   };
 
   const loadUser = async (currentToken = token) => {
@@ -63,11 +66,14 @@ export const AuthProvider = ({ children }) => {
       setUser(res.data);
     } catch (err) {
       console.error("Lỗi khi load user:", err);
-      logout();
+      if (err.response?.status === 401) {
+        logout();
+      }
     } finally {
       setLoading(false);
     }
   };
+
 
   const updateUser = async (formData) => {
     try {

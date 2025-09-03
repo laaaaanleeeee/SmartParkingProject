@@ -4,6 +4,7 @@ import { getParkingLotDetail } from "../services/ParkingLotService";
 import { getMyVehicles } from "../services/VehicleService";
 import { getSlotByParkingLotId } from "../services/SlotService";
 import { createBooking } from "../services/BookingService";
+import { createPayment } from "../services/PaymentService";
 import { Form, Button, DatePicker, Select, message, Spin } from "antd";
 import { Car, MapPin } from "lucide-react";
 import moment from "moment";
@@ -64,10 +65,19 @@ const BookingPage = () => {
     };
 
     try {
-      const res = await createBooking(bookingData);
+      const resBooking = await createBooking(bookingData);
+
+      const paymentRes = await createPayment({
+        bookingId: resBooking.data.id,
+        method: values.paymentMethod,
+      });
+
       message.success("Đặt chỗ thành công, vui lòng thanh toán!");
-      navigate(`/payment/${res.data.id}`, {
-        state: { booking: res.data, method: values.paymentMethod },
+      navigate(`/payment/${resBooking.data.id}`, {
+        state: {
+          booking: resBooking.data,
+          payment: paymentRes.data,
+        },
       });
     } catch (error) {
       console.error(error);

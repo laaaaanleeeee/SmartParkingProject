@@ -1,8 +1,10 @@
 package com.data.controller;
 
+import com.data.dto.request.ParkingLotRequestDTO;
 import com.data.dto.response.PageDTO;
 import com.data.dto.response.ParkingLotResponseDTO;
 import com.data.service.ParkingLotService;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -42,4 +44,21 @@ public class ParkingLotController {
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+
+    @PostMapping
+    public ResponseEntity<ParkingLotResponseDTO> create(@RequestBody @Valid ParkingLotRequestDTO dto) {
+        return new ResponseEntity<>(parkingLotService.createParkingLot(dto), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ParkingLotResponseDTO> update(@PathVariable Long id, @RequestBody @Valid ParkingLotRequestDTO dto) {
+        return ResponseEntity.ok(parkingLotService.updateParkingLot(id, dto));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        parkingLotService.deleteParkingLot(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }

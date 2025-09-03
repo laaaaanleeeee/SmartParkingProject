@@ -41,7 +41,7 @@ const Benefits = () => {
                             key={idx}
                             className={`p-6 rounded-xl border-2 ${item.borderColor} bg-opacity-80 hover:rotate-2 transition-transform duration-300 ${bgClass1}`}
                         >
-                            <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center mx-auto mb-4 shadow-md">
+                            <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center mx-auto mb-4 shadow-md text-black">
                                 {item.icon}
                             </div>
                             <h3 className="text-xl font-semibold mb-2">{item.title}</h3>

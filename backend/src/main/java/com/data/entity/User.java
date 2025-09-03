@@ -10,6 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -36,11 +37,12 @@ public class User implements UserDetails {
     @Column(nullable = false, length = 100)
     String fullName;
 
-    @Column(unique = true, length = 15)
+    @Column(nullable = false, unique = true, length = 15)
     String phone;
 
+    @Column(nullable = false)
     @Temporal(TemporalType.DATE)
-    Date dob;
+    LocalDate dob;
 
     @Enumerated(EnumType.STRING)
     UserGender userGender;

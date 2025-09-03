@@ -20,10 +20,10 @@ const Footer = () => {
                     <h3 className="text-lg font-semibold mb-4">Danh mục</h3>
                     <ul className="space-y-2 text-sm text-gray-400">
                         <li><Link to="/" className="hover:text-white">Trang chủ</Link></li>
-                        <li><Link to="/menu" className="hover:text-white">Giới thiệu</Link></li>
-                        <li><Link to="/about" className="hover:text-white">Tin tức</Link></li>
-                        <li><Link to="/news" className="hover:text-white">Bản đồ bãi đỗ</Link></li>
-                        <li><Link to="/booking" className="hover:text-white">Đặt chỗ ngay</Link></li>
+                        <li><Link to="/solutions" className="hover:text-white">Giải pháp</Link></li>
+                        <li><Link to="/technologies" className="hover:text-white">Công nghệ</Link></li>
+                        <li><Link to="/news" className="hover:text-white">Tin tức</Link></li>
+                        <li><Link to="/parking-lots" className="hover:text-white">Đặt chỗ ngay</Link></li>
                     </ul>
                 </div>
 
@@ -33,7 +33,7 @@ const Footer = () => {
                         <li><a href="#" className="hover:text-white">Câu hỏi thường gặp</a></li>
                         <li><a href="#" className="hover:text-white">Điều khoản dịch vụ</a></li>
                         <li><a href="#" className="hover:text-white">Chính sách bảo mật</a></li>
-                        <li><a href="#" className="hover:text-white">Liên hệ</a></li>
+                        <li><a href="contact" className="hover:text-white">Liên hệ</a></li>
                     </ul>
                 </div>
 

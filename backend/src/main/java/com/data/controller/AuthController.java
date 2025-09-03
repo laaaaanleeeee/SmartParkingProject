@@ -1,10 +1,13 @@
 package com.data.controller;
 
 import com.data.dto.request.LoginRequest;
+import com.data.dto.request.RefreshTokenRequest;
+import com.data.dto.request.SignUpRequestDTO;
 import com.data.dto.request.UpdateUserRequest;
 import com.data.dto.response.UserResponseDTO;
 import com.data.dto.response.AuthResponse;
 import com.data.entity.User;
+import com.data.enums.UserRole;
 import com.data.security.JwtUtil;
 import com.data.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -30,12 +33,21 @@ public class AuthController {
     private final JwtUtil jwtUtil;
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponseDTO> register(@RequestBody User user) {
-        if (userService.findByUsername(user.getUsername()).isPresent()) {
+    public ResponseEntity<UserResponseDTO> register(@RequestBody SignUpRequestDTO req) {
+        if (userService.findByUsername(req.getUsername()).isPresent()) {
             return ResponseEntity.badRequest().build();
         }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        User user = new User();
+        user.setUsername(req.getUsername());
+        user.setPassword(passwordEncoder.encode(req.getPassword()));
+        user.setEmail(req.getEmail());
+        user.setFullName(req.getFullName());
+        user.setPhone(req.getPhone());
+        user.setDob(req.getDob());
+        user.setUserGender(req.getUserGender());
         user.setCreatedAt(LocalDateTime.now());
+        user.setUserRole(UserRole.CLIENT);
         User saved = userService.saveUser(user);
         return ResponseEntity.ok(new UserResponseDTO(saved));
     }
@@ -58,10 +70,13 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refresh(@RequestBody String refreshToken) {
+    public ResponseEntity<?> refresh(@RequestBody RefreshTokenRequest req) {
         try {
+            String refreshToken = req.getRefreshToken();
             String username = jwtUtil.getUsername(refreshToken);
-            if (jwtUtil.isExpired(refreshToken)) return ResponseEntity.status(401).body("Refresh token expired");
+            if (jwtUtil.isExpired(refreshToken)) {
+                return ResponseEntity.status(401).body("Refresh token expired");
+            }
 
             var user = (User) userService.loadUserByUsername(username);
             String newAccess = jwtUtil.generateAccessToken(user.getUsername(), user.getUserRole().name());
@@ -71,6 +86,7 @@ public class AuthController {
             return ResponseEntity.status(401).body("Invalid refresh token");
         }
     }
+
 
     @GetMapping("/me")
     public ResponseEntity<UserResponseDTO> me(Authentication authentication) {
