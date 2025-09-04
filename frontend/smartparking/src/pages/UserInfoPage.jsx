@@ -40,12 +40,12 @@ const UserInfoPage = () => {
             }`}>
             <User size={18} /> Thông tin cá nhân
           </button>
-          <button onClick={() => setActiveTab("membership")}
+          {/* <button onClick={() => setActiveTab("membership")}
             className={`flex items-center gap-2 w-full px-4 py-2 rounded-lg text-left ${
               activeTab === "membership" ? "bg-green-500 text-white" : `${textClass1} ${hoverClass}`
             }`}>
             <MapPin size={18} /> Gói hội viên
-          </button>
+          </button> */}
           <button onClick={() => setActiveTab("history")}
             className={`flex items-center gap-2 w-full px-4 py-2 rounded-lg text-left ${
               activeTab === "history" ? "bg-green-500 text-white" : `${textClass1} ${hoverClass}`

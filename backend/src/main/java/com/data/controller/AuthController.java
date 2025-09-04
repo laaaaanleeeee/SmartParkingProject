@@ -1,9 +1,7 @@
 package com.data.controller;
 
-import com.data.dto.request.LoginRequest;
-import com.data.dto.request.RefreshTokenRequest;
-import com.data.dto.request.SignUpRequestDTO;
-import com.data.dto.request.UpdateUserRequest;
+import com.data.dto.request.*;
+import com.data.dto.response.PageDTO;
 import com.data.dto.response.UserResponseDTO;
 import com.data.dto.response.AuthResponse;
 import com.data.entity.User;
@@ -11,6 +9,9 @@ import com.data.enums.UserRole;
 import com.data.security.JwtUtil;
 import com.data.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -117,5 +118,71 @@ public class AuthController {
         User updated = userService.saveUser(user);
 
         return ResponseEntity.ok(new UserResponseDTO(updated));
+    }
+
+    @GetMapping("/admin/users")
+    public ResponseEntity<PageDTO<UserResponseDTO>> getAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String username,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String fullName,
+            Authentication authentication
+    ) {
+        User currentUser = (User) authentication.getPrincipal();
+        if (!currentUser.getUserRole().equals(UserRole.ADMIN)) {
+            return ResponseEntity.status(403).build();
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<User> usersPage = userService.getAllUsers(pageable, username, email, fullName);
+
+        Page<UserResponseDTO> dtoPage = usersPage.map(UserResponseDTO::new);
+        return ResponseEntity.ok(PageDTO.of(dtoPage));
+    }
+
+    @PostMapping("/admin/users")
+    public ResponseEntity<UserResponseDTO> createUser(@RequestBody SignUpRequestDTO req) {
+        if (userService.findByUsername(req.getUsername()).isPresent()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        User user = new User();
+        user.setUsername(req.getUsername());
+        user.setPassword(passwordEncoder.encode(req.getPassword()));
+        user.setEmail(req.getEmail());
+        user.setFullName(req.getFullName());
+        user.setPhone(req.getPhone());
+        user.setDob(req.getDob());
+        user.setUserGender(req.getUserGender());
+        user.setCreatedAt(LocalDateTime.now());
+        user.setUserRole(req.getUserRole());
+
+        User saved = userService.saveUser(user);
+        return ResponseEntity.ok(new UserResponseDTO(saved));
+    }
+
+    @PutMapping("/admin/users/{id}")
+    public ResponseEntity<UserResponseDTO> updateUser(
+            @PathVariable Long id,
+            @RequestBody UpdateUserAdminRequest req
+    ) {
+        User user = userService.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setEmail(req.getEmail());
+        user.setFullName(req.getFullName());
+        user.setPhone(req.getPhone());
+        user.setDob(req.getDob());
+        user.setUserGender(req.getUserGender());
+        user.setUserRole(req.getUserRole());
+
+        User updated = userService.saveUser(user);
+        return ResponseEntity.ok(new UserResponseDTO(updated));
+    }
+
+    @DeleteMapping("/admin/users/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        userService.deleteUserById(id);
+        return ResponseEntity.ok().build();
     }
 }
