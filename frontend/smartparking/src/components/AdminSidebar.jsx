@@ -7,8 +7,9 @@ import {
   CalendarDays,
   CreditCard,
   BarChart2,
-  Settings,
+  LogOut,
 } from "lucide-react";
+import { useAuth } from "../hooks/useAuth";
 
 const menuItems = [
   { to: "/admin/manage-parking-lots", label: "Parking Lots", icon: <LayoutDashboard size={20} /> },
@@ -17,14 +18,15 @@ const menuItems = [
   { to: "/admin/manage-news", label: "News", icon: <CalendarDays size={20} /> },
   { to: "/admin/manage-sensors", label: "Sensors", icon: <CreditCard size={20} /> },
   { to: "/admin/chat", label: "Chat", icon: <BarChart2 size={20} /> },
-  { to: "/admin/settings", label: "Settings", icon: <Settings size={20} /> },
 ];
 
 const AdminSidebar = () => {
+  const { logout } = useAuth();
+
   return (
     <div className="h-screen w-64 bg-gray-900 text-white flex flex-col p-4">
       <h2 className="text-2xl font-bold mb-8">Management</h2>
-      <nav className="flex flex-col gap-4">
+      <nav className="flex flex-col gap-4 flex-grow">
         {menuItems.map((item) => (
           <NavLink
             key={item.to}
@@ -40,6 +42,14 @@ const AdminSidebar = () => {
           </NavLink>
         ))}
       </nav>
+
+      <button
+        onClick={logout}
+        className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors mt-auto"
+      >
+        <LogOut size={20} />
+        <span>Logout</span>
+      </button>
     </div>
   );
 };

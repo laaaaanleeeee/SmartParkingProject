@@ -25,3 +25,29 @@ export const confirmBooking = (id) => {
 export const completeBooking = (id) => {
   return api.put(`/bookings/${id}/complete`);
 };
+
+
+export const getAllBookings = (filters = {}) => {
+  const {
+    page = 0,
+    size = 10,
+    username = "",
+    status = "",
+    lotId = "",
+  } = filters;
+
+  return api.get("/bookings/admin/all-bookings", {
+    params: {
+      page,
+      size,
+      username: username || undefined,
+      status: status || undefined,
+      lotId: lotId || undefined,
+    },
+  });
+};
+
+
+export const adminCreateBooking = (data) => api.post("/bookings/admin/create", data);
+export const adminUpdateBooking = (id, data) => api.put(`/bookings/admin/update/${id}`, data);
+export const adminDeleteBooking = (id) => api.delete(`/bookings/admin/delete/${id}`);

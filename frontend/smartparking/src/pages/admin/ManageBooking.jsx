@@ -1,11 +1,196 @@
-import React from 'react'
+import React, { useEffect, useState } from "react";
+import { Table, message, Button, Modal, Form, Input, Select, Popconfirm } from "antd";
+import { getAllBookings, adminCreateBooking, adminUpdateBooking, adminDeleteBooking } from "../../services/BookingService";
+
+const { Option } = Select;
 
 const ManageBooking = () => {
-  return (
-    <div>
-      
-    </div>
-  )
-}
+  const [loading, setLoading] = useState(false);
+  const [bookings, setBookings] = useState([]);
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0,
+  });
 
-export default ManageBooking
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingBooking, setEditingBooking] = useState(null);
+  const [form] = Form.useForm();
+
+  const fetchBookings = async (page = 1, size = 10, filters = {}) => {
+    try {
+      setLoading(true);
+      const res = await getAllBookings({ page: page - 1, size, ...filters });
+      setBookings(res.data.listDTO);
+      setPagination({
+        current: res.data.page + 1,
+        pageSize: res.data.size,
+        total: res.data.totalElement,
+      });
+    } catch (error) {
+      console.error(error);
+      message.error("Failed to load bookings");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBookings(pagination.current, pagination.pageSize);
+  }, []);
+
+  const handleAdd = () => {
+    setEditingBooking(null);
+    form.resetFields();
+    setIsModalOpen(true);
+  };
+
+  const handleEdit = (record) => {
+    setEditingBooking(record);
+    form.setFieldsValue(record);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await adminDeleteBooking(id);
+      message.success("Deleted successfully");
+      fetchBookings(pagination.current, pagination.pageSize);
+    } catch (error) {
+      console.error(error);
+      message.error("Failed to delete");
+    }
+  };
+
+  const handleOk = async () => {
+    try {
+      const values = await form.validateFields();
+      if (editingBooking) {
+        await adminUpdateBooking(editingBooking.id, values);
+        message.success("Updated successfully");
+      } else {
+        await adminCreateBooking(values);
+        message.success("Created successfully");
+      }
+      setIsModalOpen(false);
+      fetchBookings(pagination.current, pagination.pageSize);
+    } catch (error) {
+      console.error(error);
+      message.error("Failed to save");
+    }
+  };
+
+  const columns = [
+    { title: "ID", dataIndex: "id", key: "id" },
+    { title: "User ID", dataIndex: "userId", key: "userId" },
+    { title: "Parking Lot ID", dataIndex: "parkingLotId", key: "parkingLotId" },
+    { title: "Slot ID", dataIndex: "parkingSlotId", key: "parkingSlotId" },
+    { title: "Vehicle ID", dataIndex: "vehicleId", key: "vehicleId" },
+    { title: "Status", dataIndex: "bookingStatus", key: "bookingStatus" },
+    { title: "Total Price", dataIndex: "totalPrice", key: "totalPrice" },
+    { title: "Start Time", dataIndex: "startTime", key: "startTime" },
+    { title: "End Time", dataIndex: "endTime", key: "endTime" },
+    { title: "Created At", dataIndex: "createdAt", key: "createdAt" },
+    { title: "Updated At", dataIndex: "updatedAt", key: "updatedAt" },
+    { title: "Cancelled At", dataIndex: "cancelledAt", key: "cancelledAt" },
+    { title: "Expire At", dataIndex: "expireAt", key: "expireAt" },
+    { title: "Cancellation Reason", dataIndex: "cancellationReason", key: "cancellationReason" },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <div className="flex gap-2">
+          <Button type="link" onClick={() => handleEdit(record)}>Edit</Button>
+          <Popconfirm title="Are you sure delete this?" onConfirm={() => handleDelete(record.id)}>
+            <Button type="link" danger>Delete</Button>
+          </Popconfirm>
+        </div>
+      ),
+    },
+  ];
+
+
+  return (
+    <div className="p-6">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-xl font-bold">Manage Bookings</h1>
+        <Button type="primary" onClick={handleAdd}>Add Booking</Button>
+      </div>
+      <Form layout="inline" onFinish={(values) => fetchBookings(1, pagination.pageSize, values)}>
+        <Form.Item name="username" label="Username">
+          <Input placeholder="Search username" />
+        </Form.Item>
+        <Form.Item name="status" label="Status">
+          <Select allowClear style={{ width: 150 }}>
+            <Option value="PENDING">PENDING</Option>
+            <Option value="CONFIRMED">CONFIRMED</Option>
+            <Option value="CANCELLED">CANCELLED</Option>
+          </Select>
+        </Form.Item>
+        <Form.Item name="lotId" label="Lot ID">
+          <Input placeholder="Search lot id" />
+        </Form.Item>
+        <Form.Item>
+          <Button type="primary" htmlType="submit">Search</Button>
+        </Form.Item>
+      </Form>
+
+      <Table
+        loading={loading}
+        columns={columns}
+        dataSource={bookings}
+        rowKey="id"
+        pagination={{
+          current: pagination.current,
+          pageSize: pagination.pageSize,
+          total: pagination.total,
+          onChange: (page, pageSize) => fetchBookings(page, pageSize),
+        }}
+      />
+
+      <Modal
+        title={editingBooking ? "Edit Booking" : "Add Booking"}
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={() => setIsModalOpen(false)}
+        okText="Save"
+      >
+        <Form form={form} layout="vertical">
+          <Form.Item name="userId" label="User ID" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="parkingLotId" label="Parking Lot ID" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="parkingSlotId" label="Slot ID">
+            <Input />
+          </Form.Item>
+          <Form.Item name="vehicleId" label="Vehicle ID">
+            <Input />
+          </Form.Item>
+          <Form.Item name="bookingStatus" label="Status" rules={[{ required: true }]}>
+            <Select>
+              <Option value="PENDING">PENDING</Option>
+              <Option value="CONFIRMED">CONFIRMED</Option>
+              <Option value="CANCELLED">CANCELLED</Option>
+            </Select>
+          </Form.Item>
+          <Form.Item name="startTime" label="Start Time" rules={[{ required: true }]}>
+            <Input type="datetime-local" />
+          </Form.Item>
+          <Form.Item name="endTime" label="End Time" rules={[{ required: true }]}>
+            <Input type="datetime-local" />
+          </Form.Item>
+          <Form.Item name="totalPrice" label="Total Price">
+            <Input type="number" />
+          </Form.Item>
+          <Form.Item name="cancellationReason" label="Cancellation Reason">
+            <Input.TextArea />
+          </Form.Item>
+        </Form>
+      </Modal>
+    </div>
+  );
+};
+
+export default ManageBooking;

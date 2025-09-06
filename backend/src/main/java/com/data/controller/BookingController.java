@@ -3,6 +3,7 @@ package com.data.controller;
 import com.data.dto.request.BookingRequestDTO;
 import com.data.dto.response.BookingResponseDTO;
 import com.data.dto.response.PageDTO;
+import com.data.enums.BookingStatus;
 import com.data.service.BookingService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -60,5 +61,34 @@ public class BookingController {
     @PutMapping("/{id}/complete")
     public ResponseEntity<BookingResponseDTO> completeBooking(@PathVariable Long id) {
         return ResponseEntity.ok(bookingService.completeBooking(id));
+    }
+
+    @GetMapping("/admin/all-bookings")
+    public ResponseEntity<PageDTO<BookingResponseDTO>> searchBookings(
+            Pageable pageable,
+            @RequestParam(required = false) String username,
+            @RequestParam(required = false) BookingStatus status,
+            @RequestParam(required = false) Long lotId
+    ) {
+        return ResponseEntity.ok(
+                bookingService.searchBookings(pageable, username, status, lotId)
+        );
+    }
+
+    @PutMapping("admin/update/{id}")
+    public ResponseEntity<BookingResponseDTO> updateBookingStatus(
+            @PathVariable Long id,
+            @RequestParam BookingStatus status,
+            @RequestParam(required = false) String reason
+    ) {
+        return ResponseEntity.ok(
+                bookingService.updateBookingStatus(id, status, reason)
+        );
+    }
+
+    @DeleteMapping("/admin/delete/{id}")
+    public ResponseEntity<Void> deleteBooking(@PathVariable Long id) {
+        bookingService.deleteBooking(id);
+        return ResponseEntity.noContent().build();
     }
 }

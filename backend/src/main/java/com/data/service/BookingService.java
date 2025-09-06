@@ -13,6 +13,7 @@ import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -209,5 +210,65 @@ public class BookingService {
                 bookingRepository.findByUser_Id(user.getId(), pageable)
                         .map(BookingResponseDTO::new)
         );
+    }
+
+    public PageDTO<BookingResponseDTO> searchBookings(
+            Pageable pageable,
+            String username,
+            BookingStatus status,
+            Long lotId
+    ) {
+        Page<Booking> page = bookingRepository.searchBookings(username, status, lotId, pageable);
+        return PageDTO.of(page.map(BookingResponseDTO::new));
+    }
+
+    @Transactional
+    public BookingResponseDTO updateBookingStatus(Long id, BookingStatus status, String reason) {
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Booking not found"));
+
+        booking.setBookingStatus(status);
+        booking.setUpdatedAt(LocalDateTime.now());
+
+        if (status == BookingStatus.CANCELLED) {
+            booking.setCancelledAt(LocalDateTime.now());
+            booking.setCancellationReason(reason != null ? reason : "Cancelled by admin");
+
+            Slot slot = booking.getParkingSlot();
+            if (slot != null) {
+                slot.setSlotStatus(SlotStatus.FREE);
+                slotRepository.save(slot);
+            }
+
+            ParkingLot lot = booking.getParkingLot();
+            if (lot != null) {
+                lot.setAvailableSlots(lot.getAvailableSlots() + 1);
+                parkingLotRepository.save(lot);
+            }
+        }
+
+        return new BookingResponseDTO(bookingRepository.save(booking));
+    }
+
+    @Transactional
+    public void deleteBooking(Long id) {
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Booking not found"));
+
+        if (booking.getBookingStatus() != BookingStatus.CANCELLED) {
+            Slot slot = booking.getParkingSlot();
+            if (slot != null) {
+                slot.setSlotStatus(SlotStatus.FREE);
+                slotRepository.save(slot);
+            }
+
+            ParkingLot lot = booking.getParkingLot();
+            if (lot != null) {
+                lot.setAvailableSlots(lot.getAvailableSlots() + 1);
+                parkingLotRepository.save(lot);
+            }
+        }
+
+        bookingRepository.delete(booking);
     }
 }

@@ -1,10 +1,13 @@
 package com.data.controller;
 
+import com.data.dto.request.NewsRequestDTO;
 import com.data.dto.response.NewsResponseDTO;
+import com.data.dto.response.PageDTO;
 import com.data.service.NewsService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,9 +23,12 @@ public class NewsController {
     NewsService newsService;
 
     @GetMapping
-    public ResponseEntity<List<NewsResponseDTO>> getAllNews() {
-        List<NewsResponseDTO> news = newsService.getAllNews();
-        return new ResponseEntity<>(news, HttpStatus.OK);
+    public ResponseEntity<PageDTO<NewsResponseDTO>> getAllNews(
+            Pageable pageable,
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String poster
+    ) {
+        return ResponseEntity.ok(newsService.searchNews(pageable, title, poster));
     }
 
     @GetMapping("/{id}")
@@ -32,5 +38,24 @@ public class NewsController {
             return new ResponseEntity<>(news, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @PostMapping("/admin/create-news")
+    public ResponseEntity<NewsResponseDTO> createNews(@RequestBody NewsRequestDTO request) {
+        return ResponseEntity.ok(newsService.createNews(request));
+    }
+
+    @PutMapping("/admin/update-news/{id}")
+    public ResponseEntity<NewsResponseDTO> updateNews(
+            @PathVariable Long id,
+            @RequestBody NewsRequestDTO request
+    ) {
+        return ResponseEntity.ok(newsService.updateNews(id, request));
+    }
+
+    @DeleteMapping("/admin/delete-news/{id}")
+    public ResponseEntity<Void> deleteNews(@PathVariable Long id) {
+        newsService.deleteNews(id);
+        return ResponseEntity.noContent().build();
     }
 }
