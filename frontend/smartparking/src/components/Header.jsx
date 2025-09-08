@@ -60,7 +60,7 @@ const Header = () => {
                         <NavLink to="/contact" className="cursor-pointer flex items-center hover:text-green-600 transition-colors">
                             <span>Liên hệ</span>
                         </NavLink>
-                        <NavLink to="/parking-lots">
+                        <NavLink to="/parking_lots">
                             <button className="cursor-pointer bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition-colors">
                                 Đặt chỗ ngay
                             </button>

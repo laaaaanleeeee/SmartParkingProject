@@ -12,11 +12,11 @@ import {
 import { useAuth } from "../hooks/useAuth";
 
 const menuItems = [
-  { to: "/admin/manage-parking-lots", label: "Parking Lots", icon: <LayoutDashboard size={20} /> },
-  { to: "/admin/manage-users", label: "Users", icon: <Users size={20} /> },
-  { to: "/admin/manage-bookings", label: "Bookings", icon: <Building2 size={20} /> },
-  { to: "/admin/manage-news", label: "News", icon: <CalendarDays size={20} /> },
-  { to: "/admin/manage-sensors", label: "Sensors", icon: <CreditCard size={20} /> },
+  { to: "/admin/manage_parking_lots", label: "Parking Lots", icon: <LayoutDashboard size={20} /> },
+  { to: "/admin/manage_users", label: "Users", icon: <Users size={20} /> },
+  { to: "/admin/manage_bookings", label: "Bookings", icon: <Building2 size={20} /> },
+  { to: "/admin/manage_news", label: "News", icon: <CalendarDays size={20} /> },
+  { to: "/admin/manage_sensors", label: "Sensors", icon: <CreditCard size={20} /> },
   { to: "/admin/chat", label: "Chat", icon: <BarChart2 size={20} /> },
 ];
 

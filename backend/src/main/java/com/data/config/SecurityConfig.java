@@ -36,6 +36,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/parking-lots/**").hasAnyRole("ADMIN", "OWNER")
                         .requestMatchers(HttpMethod.GET, "/api/auth/me").hasAnyRole("CLIENT", "ADMIN", "OWNER")
                         .requestMatchers(HttpMethod.PUT, "/api/auth/update").hasAnyRole("CLIENT", "ADMIN", "OWNER")
+                        .requestMatchers("/api/bookings/owner/**").hasRole("OWNER")
+                        .requestMatchers("/api/owner/**").hasRole("OWNER")
                         .requestMatchers(HttpMethod.GET, "/api/bookings/**").hasAnyRole("CLIENT", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/bookings/**").hasRole("CLIENT")
                         .requestMatchers(HttpMethod.PUT, "/api/bookings/**").hasRole("CLIENT")
@@ -50,6 +52,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/payments/*/refund").hasAnyRole("CLIENT", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/payments").hasRole("ADMIN")
                         .requestMatchers("/api/owner/**").hasRole("OWNER")
+                        .requestMatchers("/api/bookings/owner/**").hasRole("OWNER")
                         .requestMatchers("/api/auth/admin/**").hasRole("ADMIN")
 
                         .anyRequest().authenticated()

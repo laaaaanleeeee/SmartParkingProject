@@ -91,4 +91,47 @@ public class BookingController {
         bookingService.deleteBooking(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/owner/my-lot-bookings")
+    public ResponseEntity<PageDTO<BookingResponseDTO>> getBookingsByOwner(
+            Pageable pageable,
+            @RequestParam(required = false) BookingStatus status,
+            Authentication auth
+    ) {
+        return ResponseEntity.ok(
+                bookingService.getBookingsByOwner(auth.getName(), pageable, status)
+        );
+    }
+
+    @PutMapping("/owner/confirm/{id}")
+    public ResponseEntity<BookingResponseDTO> confirmBookingAsOwner(
+            @PathVariable Long id,
+            Authentication auth
+    ) {
+        return ResponseEntity.ok(
+                bookingService.confirmBookingAsOwner(id, auth.getName())
+        );
+    }
+
+    @PutMapping("/owner/cancel/{id}")
+    public ResponseEntity<BookingResponseDTO> cancelBookingAsOwner(
+            @PathVariable Long id,
+            @RequestParam String reason,
+            Authentication auth
+    ) {
+        return ResponseEntity.ok(
+                bookingService.cancelBookingAsOwner(id, reason, auth.getName())
+        );
+    }
+
+    @PutMapping("/owner/complete/{id}")
+    public ResponseEntity<BookingResponseDTO> completeBookingAsOwner(
+            @PathVariable Long id,
+            Authentication auth
+    ) {
+        return ResponseEntity.ok(
+                bookingService.completeBookingAsOwner(id, auth.getName())
+        );
+    }
+
 }

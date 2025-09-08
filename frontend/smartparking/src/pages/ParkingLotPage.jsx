@@ -235,7 +235,7 @@ const ParkingLotPage = () => {
                                     Số chỗ trống: {lot.availableSlots}/{lot.totalSlots}
                                 </p>
                                 <button
-                                    onClick={() => navigate(`/parking-lots/${lot.id}`)}
+                                    onClick={() => navigate(`/parking_lots/${lot.id}`)}
                                     className="mt-4 w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
                                 >
                                     Xem chi tiết

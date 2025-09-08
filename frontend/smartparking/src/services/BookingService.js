@@ -51,3 +51,28 @@ export const getAllBookings = (filters = {}) => {
 export const adminCreateBooking = (data) => api.post("/bookings/admin/create", data);
 export const adminUpdateBooking = (id, data) => api.put(`/bookings/admin/update/${id}`, data);
 export const adminDeleteBooking = (id) => api.delete(`/bookings/admin/delete/${id}`);
+
+export const getMyLotBookings = (params = {}) => {
+  const { page = 0, size = 10, status = "" } = params;
+  return api.get("/bookings/owner/my-lot-bookings", {
+    params: {
+      page,
+      size,
+      status: status || undefined,
+    },
+  });
+};
+
+export const ownerConfirmBooking = (id) => {
+  return api.put(`/bookings/owner/confirm/${id}`);
+};
+
+export const ownerCompleteBooking = (id) => {
+  return api.put(`/bookings/owner/complete/${id}`);
+};
+
+export const ownerCancelBooking = (id, reason) => {
+  return api.put(`/bookings/owner/cancel/${id}`, null, {
+    params: { reason },
+  });
+};

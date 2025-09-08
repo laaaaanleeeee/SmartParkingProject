@@ -62,12 +62,12 @@ const BookingHistory = () => {
     },
     {
       title: "Bãi đỗ xe",
-      dataIndex: ["parkingLot", "name"],
+      dataIndex: ["parkingLotName"],
       key: "parkingLot",
     },
     {
       title: "Vị trí slot",
-      dataIndex: ["slot", "slotCode"],
+      dataIndex: ["slotName"],
       key: "slot",
     },
     {
@@ -84,7 +84,7 @@ const BookingHistory = () => {
     },
     {
       title: "Trạng thái",
-      dataIndex: "status",
+      dataIndex: "bookingStatus",
       key: "status",
       render: (status) => (
         <Tag color={statusColors[status]}>{status}</Tag>

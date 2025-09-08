@@ -135,7 +135,7 @@ const ParkingLotDetailPage = () => {
 
           <button
             onClick={() =>
-              navigate(`/parking-lots/${parkingLot.id}/booking`, {
+              navigate(`/parking_lots/${parkingLot.id}/booking`, {
                 state: { parkingLot },
               })
             }

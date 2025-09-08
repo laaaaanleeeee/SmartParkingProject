@@ -106,6 +106,81 @@ public class ParkingLotService {
         parkingLotRepository.delete(lot);
     }
 
+    public PageDTO<ParkingLotResponseDTO> getMyParkingLots(Long ownerId, Pageable pageable) {
+        Page<ParkingLot> parkingLots = parkingLotRepository.findByOwnerId(ownerId, pageable);
+
+        PageDTO<ParkingLotResponseDTO> pageDTO = new PageDTO<>();
+        pageDTO.setListDTO(parkingLots.map(this::convertToDTO).getContent());
+        pageDTO.setPage(parkingLots.getNumber());
+        pageDTO.setTotalPage(parkingLots.getTotalPages());
+        pageDTO.setSize(parkingLots.getSize());
+        pageDTO.setNumElement(parkingLots.getNumberOfElements());
+        pageDTO.setTotalElement(parkingLots.getTotalElements());
+        pageDTO.setFirst(parkingLots.isFirst());
+        pageDTO.setLast(parkingLots.isLast());
+
+        return pageDTO;
+    }
+
+    @Transactional
+    public ParkingLotResponseDTO createMyParkingLot(Long ownerId, ParkingLotRequestDTO dto) {
+        User owner = userRepository.findById(ownerId)
+                .orElseThrow(() -> new NotFoundException("Owner not found"));
+
+        ParkingLot lot = new ParkingLot();
+        lot.setName(dto.getName());
+        lot.setAddress(dto.getAddress());
+        lot.setCity(dto.getCity());
+        lot.setWard(dto.getWard());
+        lot.setLatitude(dto.getLatitude());
+        lot.setLongitude(dto.getLongitude());
+        lot.setTotalSlots(dto.getTotalSlots());
+        lot.setAvailableSlots(dto.getAvailableSlots());
+        lot.setDescription(dto.getDescription());
+        lot.setParkingLotStatus(dto.getParkingLotStatus());
+        lot.setOwner(owner);
+        lot.setCreatedAt(LocalDateTime.now());
+        lot.setUpdatedAt(LocalDateTime.now());
+
+        return convertToDTO(parkingLotRepository.save(lot));
+    }
+
+    @Transactional
+    public ParkingLotResponseDTO updateMyParkingLot(Long id, Long ownerId, ParkingLotRequestDTO dto) {
+        ParkingLot lot = parkingLotRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Parking lot not found"));
+
+        if (!lot.getOwner().getId().equals(ownerId)) {
+            throw new RuntimeException("You are not the owner of this parking lot");
+        }
+
+        lot.setName(dto.getName());
+        lot.setAddress(dto.getAddress());
+        lot.setCity(dto.getCity());
+        lot.setWard(dto.getWard());
+        lot.setLatitude(dto.getLatitude());
+        lot.setLongitude(dto.getLongitude());
+        lot.setTotalSlots(dto.getTotalSlots());
+        lot.setAvailableSlots(dto.getAvailableSlots());
+        lot.setDescription(dto.getDescription());
+        lot.setParkingLotStatus(dto.getParkingLotStatus());
+        lot.setUpdatedAt(LocalDateTime.now());
+
+        return convertToDTO(parkingLotRepository.save(lot));
+    }
+
+    @Transactional
+    public void deleteMyParkingLot(Long id, Long ownerId) {
+        ParkingLot lot = parkingLotRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Parking lot not found"));
+
+        if (!lot.getOwner().getId().equals(ownerId)) {
+            throw new RuntimeException("You are not the owner of this parking lot");
+        }
+
+        parkingLotRepository.delete(lot);
+    }
+
 
     public ParkingLotResponseDTO convertToDTO(ParkingLot parkingLot) {
         ParkingLotResponseDTO dto = new ParkingLotResponseDTO();

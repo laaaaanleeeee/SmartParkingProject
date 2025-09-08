@@ -36,4 +36,15 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             @Param("lotId") Long lotId,
             Pageable pageable
     );
+
+    @Query("""
+    SELECT b FROM Booking b
+    WHERE b.parkingLot.owner.id = :ownerId
+    AND (:status IS NULL OR b.bookingStatus = :status)
+""")
+    Page<Booking> findByParkingLot_Owner_IdAndStatus(
+            @Param("ownerId") Long ownerId,
+            @Param("status") BookingStatus status,
+            Pageable pageable
+    );
 }

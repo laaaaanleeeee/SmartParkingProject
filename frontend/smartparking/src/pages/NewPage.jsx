@@ -18,7 +18,7 @@ const NewsPage = () => {
         const fetchNews = async () => {
             try {
                 const res = await getAllNews();
-                setNews(res.data);
+                setNews(res.data.listDTO || []);
             } catch (err) {
                 console.error("Lỗi fetch data: ", err);
                 message.error("Không thể tải tin tức. Vui lòng thử lại sau!");

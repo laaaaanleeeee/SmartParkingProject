@@ -3,6 +3,7 @@ package com.data.controller;
 import com.data.dto.request.ParkingLotRequestDTO;
 import com.data.dto.response.PageDTO;
 import com.data.dto.response.ParkingLotResponseDTO;
+import com.data.entity.User;
 import com.data.service.ParkingLotService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -58,6 +60,46 @@ public class ParkingLotController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         parkingLotService.deleteParkingLot(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<PageDTO<ParkingLotResponseDTO>> getMyParkingLots(
+            Authentication authentication,
+            @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).build();
+        }
+
+        User user = (User) authentication.getPrincipal();
+        PageDTO<ParkingLotResponseDTO> myLots = parkingLotService.getMyParkingLots(user.getId(), pageable);
+        return ResponseEntity.ok(myLots);
+    }
+
+    @PostMapping("/me")
+    public ResponseEntity<ParkingLotResponseDTO> createMyParkingLot(
+            @RequestBody @Valid ParkingLotRequestDTO dto,
+            Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        return new ResponseEntity<>(parkingLotService.createMyParkingLot(user.getId(), dto), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/me/{id}")
+    public ResponseEntity<ParkingLotResponseDTO> updateMyParkingLot(
+            @PathVariable Long id,
+            @RequestBody @Valid ParkingLotRequestDTO dto,
+            Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        return ResponseEntity.ok(parkingLotService.updateMyParkingLot(id, user.getId(), dto));
+    }
+
+    @DeleteMapping("/me/{id}")
+    public ResponseEntity<Void> deleteMyParkingLot(
+            @PathVariable Long id,
+            Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        parkingLotService.deleteMyParkingLot(id, user.getId());
         return ResponseEntity.noContent().build();
     }
 

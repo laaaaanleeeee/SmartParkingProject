@@ -45,3 +45,20 @@ export const updateParkingLot = (id, data) => {
 export const deleteParkingLot = (id) => {
   return api.delete(`/parking-lots/${id}`);
 };
+
+export const getMyParkingLots = (params = {}) => {
+  const { page = 0, size = 10, sort = 'id,asc' } = params;
+  return api.get('/parking-lots/me', { params: { page, size, sort } });
+};
+
+export const createMyParkingLot = (data) => {
+  return api.post('/parking-lots/me', data);
+};
+
+export const updateMyParkingLot = (id, data) => {
+  return api.put(`/parking-lots/me/${id}`, data);
+};
+
+export const deleteMyParkingLot = (id) => {
+  return api.delete(`/parking-lots/me/${id}`);
+};

@@ -271,4 +271,94 @@ public class BookingService {
 
         bookingRepository.delete(booking);
     }
+
+    public PageDTO<BookingResponseDTO> getBookingsByOwner(String username, Pageable pageable, BookingStatus status) {
+        User owner = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException("Owner not found"));
+
+        Page<Booking> page = bookingRepository.findByParkingLot_Owner_IdAndStatus(
+                owner.getId(), status, pageable
+        );
+
+        return PageDTO.of(page.map(BookingResponseDTO::new));
+    }
+
+    @Transactional
+    public BookingResponseDTO confirmBookingAsOwner(Long id, String username) {
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Booking not found"));
+
+        if (!booking.getParkingLot().getOwner().getUsername().equals(username)) {
+            throw new BadRequestException("You cannot confirm others' bookings");
+        }
+
+        if (booking.getBookingStatus() != BookingStatus.PENDING) {
+            throw new BadRequestException("Booking không ở trạng thái pending");
+        }
+
+        booking.setBookingStatus(BookingStatus.CONFIRMED);
+        booking.setUpdatedAt(LocalDateTime.now());
+
+        Slot slot = booking.getParkingSlot();
+        slot.setSlotStatus(SlotStatus.OCCUPIED);
+        slotRepository.save(slot);
+
+        return new BookingResponseDTO(bookingRepository.save(booking));
+    }
+
+    @Transactional
+    public BookingResponseDTO completeBookingAsOwner(Long id, String username) {
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Booking not found"));
+
+        if (!booking.getParkingLot().getOwner().getUsername().equals(username)) {
+            throw new BadRequestException("You cannot complete others' bookings");
+        }
+
+        if (booking.getBookingStatus() != BookingStatus.CONFIRMED) {
+            throw new BadRequestException("Booking is not confirmed");
+        }
+
+        booking.setBookingStatus(BookingStatus.COMPLETED);
+        booking.setUpdatedAt(LocalDateTime.now());
+
+        Slot slot = booking.getParkingSlot();
+        slot.setSlotStatus(SlotStatus.FREE);
+        slotRepository.save(slot);
+
+        ParkingLot lot = booking.getParkingLot();
+        lot.setAvailableSlots(lot.getAvailableSlots() + 1);
+        parkingLotRepository.save(lot);
+
+        return new BookingResponseDTO(bookingRepository.save(booking));
+    }
+
+    @Transactional
+    public BookingResponseDTO cancelBookingAsOwner(Long id, String reason, String username) {
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Booking not found"));
+
+        if (!booking.getParkingLot().getOwner().getUsername().equals(username)) {
+            throw new BadRequestException("You cannot cancel bookings for lots you don't own");
+        }
+
+        if (booking.getBookingStatus() == BookingStatus.CANCELLED) {
+            throw new BadRequestException("Booking already cancelled");
+        }
+
+        booking.setBookingStatus(BookingStatus.CANCELLED);
+        booking.setCancelledAt(LocalDateTime.now());
+        booking.setCancellationReason(reason);
+        booking.setUpdatedAt(LocalDateTime.now());
+
+        Slot slot = booking.getParkingSlot();
+        slot.setSlotStatus(SlotStatus.FREE);
+        slotRepository.save(slot);
+
+        ParkingLot lot = booking.getParkingLot();
+        lot.setAvailableSlots(lot.getAvailableSlots() + 1);
+        parkingLotRepository.save(lot);
+
+        return new BookingResponseDTO(bookingRepository.save(booking));
+    }
 }

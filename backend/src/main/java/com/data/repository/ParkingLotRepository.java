@@ -32,4 +32,6 @@ public interface ParkingLotRepository extends JpaRepository<ParkingLot, Long> {
             @Param("minRating") Double minRating,
             @Param("minSlots") Integer minSlots,
             Pageable pageable);
+
+    Page<ParkingLot> findByOwnerId(Long ownerId, Pageable pageable);
 }
