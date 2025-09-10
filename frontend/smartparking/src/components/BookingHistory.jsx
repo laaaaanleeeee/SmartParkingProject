@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { getMyBookings, cancelBooking } from "../services/BookingService";
 import { message, Table, Button, Tag } from "antd";
+import { useTheme } from "../hooks/useTheme";
 
 const BookingHistory = () => {
+  const { theme } = useTheme();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState({
@@ -10,6 +12,10 @@ const BookingHistory = () => {
     pageSize: 10,
     total: 0,
   });
+
+  const textClass = theme === "dark" ? "text-gray-200" : "text-gray-800";
+  const bgClass = theme === "dark" ? "bg-gray-900" : "bg-white";
+  const tableRowClass = theme === "dark" ? "bg-gray-800 text-green-500" : "bg-white text-gray-800";
 
   useEffect(() => {
     fetchBookings(pagination.current, pagination.pageSize);
@@ -86,9 +92,7 @@ const BookingHistory = () => {
       title: "Trạng thái",
       dataIndex: "bookingStatus",
       key: "status",
-      render: (status) => (
-        <Tag color={statusColors[status]}>{status}</Tag>
-      ),
+      render: (status) => <Tag color={statusColors[status]}>{status}</Tag>,
     },
     {
       title: "Hành động",
@@ -103,9 +107,9 @@ const BookingHistory = () => {
   ];
 
   return (
-    <div>
+    <div className={`${bgClass} p-4 rounded-lg shadow`}>
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Lịch sử đặt chỗ</h2>
+        <h2 className={`text-xl font-semibold ${textClass}`}>Lịch sử đặt chỗ</h2>
       </div>
 
       <Table
@@ -117,6 +121,9 @@ const BookingHistory = () => {
           ...pagination,
           onChange: (page, pageSize) => fetchBookings(page, pageSize),
         }}
+        className={`${bgClass} ${textClass}`}
+        rowClassName={() => tableRowClass}
+        bordered
       />
     </div>
   );

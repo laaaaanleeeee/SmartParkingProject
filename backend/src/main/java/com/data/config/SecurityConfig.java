@@ -54,7 +54,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/owner/**").hasRole("OWNER")
                         .requestMatchers("/api/bookings/owner/**").hasRole("OWNER")
                         .requestMatchers("/api/auth/admin/**").hasRole("ADMIN")
-
+                        .requestMatchers(HttpMethod.POST, "/api/vehicle-entry/detect").permitAll()
                         .anyRequest().authenticated()
                 )
 

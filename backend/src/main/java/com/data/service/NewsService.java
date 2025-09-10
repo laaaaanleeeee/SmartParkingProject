@@ -6,6 +6,7 @@ import com.data.dto.response.PageDTO;
 import com.data.dto.response.UserResponseDTO;
 import com.data.entity.News;
 import com.data.entity.User;
+import com.data.enums.NewsCategory;
 import com.data.repository.NewsRepository;
 import com.data.repository.UserRepository;
 import lombok.AccessLevel;
@@ -58,6 +59,7 @@ public class NewsService {
         news.setContent(request.getContent());
         news.setPostedBy(poster);
         news.setPostedAt(LocalDateTime.now());
+        news.setNewsCategory(request.getNewsCategory());
 
         return convertToDTO(newsRepository.save(news));
     }
@@ -68,6 +70,7 @@ public class NewsService {
 
         news.setTitle(request.getTitle());
         news.setContent(request.getContent());
+        news.setNewsCategory(request.getNewsCategory());
 
         if (request.getPostedById() != null) {
             User poster = userRepository.findById(request.getPostedById())
@@ -92,6 +95,21 @@ public class NewsService {
         dto.setContent(news.getContent());
         dto.setPostedAt(news.getPostedAt().toString());
         dto.setPostedBy(new UserResponseDTO(news.getPostedBy()));
+        dto.setNewsCategory(news.getNewsCategory());
         return dto;
+    }
+
+    public List<NewsResponseDTO> getNewestNews() {
+        return newsRepository.findAllByOrderByPostedAtDesc()
+                .stream()
+                .map(this::convertToDTO)
+                .toList();
+    }
+
+    public List<NewsResponseDTO> getNewsByCategory(NewsCategory newsCategory) {
+        return newsRepository.findByNewsCategoryOrderByPostedAtDesc(newsCategory)
+                .stream()
+                .map(this::convertToDTO)
+                .toList();
     }
 }

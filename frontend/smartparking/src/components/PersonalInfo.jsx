@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
+import { useOutletContext } from "react-router-dom";
 
-const PersonalInfo = ({ inputClass, textClass1, textClass2 }) => {
+const PersonalInfo = () => {
+  const { inputClass, textClass1, textClass2 } = useOutletContext();
   const { user, updateUser } = useAuth();
+
   const [formUser, setFormUser] = useState({
     fullName: "",
     email: "",

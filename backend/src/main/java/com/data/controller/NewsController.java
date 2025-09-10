@@ -3,6 +3,7 @@ package com.data.controller;
 import com.data.dto.request.NewsRequestDTO;
 import com.data.dto.response.NewsResponseDTO;
 import com.data.dto.response.PageDTO;
+import com.data.enums.NewsCategory;
 import com.data.service.NewsService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -57,5 +58,15 @@ public class NewsController {
     public ResponseEntity<Void> deleteNews(@PathVariable Long id) {
         newsService.deleteNews(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/newest")
+    public ResponseEntity<List<NewsResponseDTO>> getNewestNews() {
+        return ResponseEntity.ok(newsService.getNewestNews());
+    }
+
+    @GetMapping("/category/{category}")
+    public ResponseEntity<List<NewsResponseDTO>> getByCategory(@PathVariable("category") NewsCategory category) {
+        return ResponseEntity.ok(newsService.getNewsByCategory(category));
     }
 }

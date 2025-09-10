@@ -120,94 +120,121 @@ const ParkingLotPage = () => {
                 Danh sách bãi đỗ xe
             </h2>
 
-            <div className={`mb-6 p-4 rounded-xl shadow ${cardClass}`}>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <Input
-                        placeholder="Tìm kiếm theo tên bãi đỗ"
-                        value={filters.name}
-                        onChange={(e) => handleFilterChange('name', e.target.value)}
-                        className={filterClass}
-                    />
-                    <Select
-                        placeholder="Chọn thành phố"
-                        allowClear
-                        value={filters.city}
-                        onChange={handleCityChange}
-                        className={`w-full ${filterClass}`}
-                        showSearch
-                        optionFilterProp="children"
-                        filterOption={(input, option) =>
-                            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                        }
-                    >
-                        {cities.map((city) => (
-                            <Option key={city.code} value={city.name}>
-                                {city.name}
-                            </Option>
-                        ))}
-                    </Select>
-                    <Select
-                        placeholder="Chọn phường"
-                        allowClear
-                        value={filters.ward}
-                        onChange={handleWardChange}
-                        className={`w-full ${filterClass}`}
-                        disabled={!filters.city}
-                        showSearch
-                        optionFilterProp="children"
-                        filterOption={(input, option) =>
-                            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                        }
-                    >
-                        {wards.map((ward) => (
-                            <Option key={ward.code} value={ward.name}>
-                                {ward.name}
-                            </Option>
-                        ))}
-                    </Select>
-                    <Select
-                        placeholder="Đánh giá tối thiểu"
-                        allowClear
-                        value={filters.minRating}
-                        onChange={(value) => handleFilterChange('minRating', value || null)}
-                        className={`w-full ${filterClass}`}
-                    >
-                        <Option value={1}>1 sao</Option>
-                        <Option value={2}>2 sao</Option>
-                        <Option value={3}>3 sao</Option>
-                        <Option value={4}>4 sao</Option>
-                        <Option value={5}>5 sao</Option>
-                    </Select>
-                    <div className={filterClass + " p-2 rounded"}>
-                        <label className="block text-xs mb-1">Khoảng giá (VNĐ/giờ):</label>
-                        <Slider
-                            range
-                            min={0}
-                            max={50000}
-                            step={1000}
-                            value={[filters.minPrice, filters.maxPrice]}
-                            onChange={(value) =>
-                                setFilters((prev) => ({
-                                    ...prev,
-                                    minPrice: value[0],
-                                    maxPrice: value[1],
-                                }))
-                            }
+            <div className={`mb-6 p-6 rounded-2xl shadow-lg ${cardClass}`}>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label className="block text-sm font-medium mb-2">Tên bãi đỗ</label>
+                        <Input
+                            placeholder="Nhập tên bãi đỗ"
+                            value={filters.name}
+                            onChange={(e) => handleFilterChange('name', e.target.value)}
+                            className={filterClass}
                         />
                     </div>
-                    <Input
-                        type="number"
-                        placeholder="Số chỗ trống tối thiểu"
-                        onChange={(e) =>
-                            handleFilterChange(
-                                'minSlots',
-                                e.target.value ? Number(e.target.value) : null
-                            )
-                        }
-                        className={filterClass}
-                    />
+
+                    <div>
+                        <label className="block text-sm font-medium mb-2">Thành phố</label>
+                        <Select
+                            placeholder="Chọn thành phố"
+                            allowClear
+                            value={filters.city}
+                            onChange={handleCityChange}
+                            className={`w-full ${filterClass}`}
+                            showSearch
+                            optionFilterProp="children"
+                            filterOption={(input, option) =>
+                                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            }
+                        >
+                            {cities.map((city) => (
+                                <Option key={city.code} value={city.name}>
+                                    {city.name}
+                                </Option>
+                            ))}
+                        </Select>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-2">Phường</label>
+                        <Select
+                            placeholder="Chọn phường"
+                            allowClear
+                            value={filters.ward}
+                            onChange={handleWardChange}
+                            className={`w-full ${filterClass}`}
+                            disabled={!filters.city}
+                            showSearch
+                            optionFilterProp="children"
+                            filterOption={(input, option) =>
+                                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            }
+                        >
+                            {wards.map((ward) => (
+                                <Option key={ward.code} value={ward.name}>
+                                    {ward.name}
+                                </Option>
+                            ))}
+                        </Select>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-2">Đánh giá tối thiểu</label>
+                        <Select
+                            placeholder="Chọn số sao"
+                            allowClear
+                            value={filters.minRating}
+                            onChange={(value) => handleFilterChange('minRating', value || null)}
+                            className={`w-full ${filterClass}`}
+                        >
+                            <Option value={1}>⭐ 1 sao</Option>
+                            <Option value={2}>⭐⭐ 2 sao</Option>
+                            <Option value={3}>⭐⭐⭐ 3 sao</Option>
+                            <Option value={4}>⭐⭐⭐⭐ 4 sao</Option>
+                            <Option value={5}>⭐⭐⭐⭐⭐ 5 sao</Option>
+                        </Select>
+                    </div>
+
+                    <div className="flex flex-col justify-between h-full">
+                        <label className="block text-sm font-medium mb-2">Khoảng giá (VNĐ/giờ)</label>
+                        <div className={`${filterClass} px-3 py-2 rounded-lg flex flex-col justify-center`}>
+                            <Slider
+                                range
+                                min={0}
+                                max={500000}
+                                step={1000}
+                                value={[filters.minPrice, filters.maxPrice]}
+                                onChange={(value) =>
+                                    setFilters((prev) => ({
+                                        ...prev,
+                                        minPrice: value[0],
+                                        maxPrice: value[1],
+                                    }))
+                                }
+                            />
+                            <div className="flex justify-between text-xs text-gray-500 mt-1">
+                                <span>{filters.minPrice.toLocaleString()} đ</span>
+                                <span>{filters.maxPrice.toLocaleString()} đ</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-2">Số chỗ trống tối thiểu</label>
+                        <Input
+                            type="number"
+                            placeholder="Nhập số chỗ"
+                            onChange={(e) =>
+                                handleFilterChange(
+                                    'minSlots',
+                                    e.target.value ? Number(e.target.value) : null
+                                )
+                            }
+                            className={filterClass}
+                        />
+                    </div>
                 </div>
             </div>
+
 
             {parkingLots.length === 0 ? (
                 <p className="text-center text-gray-500">Không tìm thấy bãi đỗ nào.</p>

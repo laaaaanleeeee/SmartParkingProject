@@ -1,4 +1,5 @@
-import {  } from 'react'
+import { } from 'react'
+import { Navigate } from 'react-router-dom'
 import './App.css'
 import MainLayout from './layout/MainLayout'
 import { Route, Routes } from 'react-router-dom'
@@ -31,6 +32,9 @@ import OwnerRevenuePage from './pages/owner/OwnerRevenuePage.jsx';
 import OwnerNotificationPage from './pages/owner/OwnerNotificationPage.jsx';
 import DetectVehiclesPage from './pages/owner/DetectVehiclesPage.jsx';
 import ChatPage from './pages/owner/ChatPage.jsx'
+import PersonalInfo from './components/PersonalInfo.jsx';
+import BookingHistory from './components/BookingHistory.jsx';
+import MyVehicles from './components/MyVehicles.jsx';
 
 function App() {
   return (
@@ -47,7 +51,14 @@ function App() {
         <Route path='/contact' element={<ContactPage />}></Route>
         <Route path='/parking_lots/:id/booking' element={<PrivateRoute><BookingPage /></PrivateRoute>}></Route>
         <Route path='/parking_lots/:id' element={<ParkingLotDetailPage />}></Route>
-        <Route path='/user' element={<PrivateRoute><UserInfoPage /></PrivateRoute>}></Route>
+
+        <Route path='/user' element={<PrivateRoute><UserInfoPage /></PrivateRoute>}>
+          <Route index element={<Navigate to="info" />} />
+          <Route path="info" element={<PersonalInfo />} />
+          <Route path="history" element={<BookingHistory />} />
+          <Route path="vehicles" element={<MyVehicles />} />
+        </Route>
+
         <Route path='/subcription' element={<SubcriptionPage />}></Route>
         <Route path='/history_booking' element={<PrivateRoute><HistoryBookingPage /></PrivateRoute>}></Route>
         <Route path='/technologies' element={<TechnologyPage />}></Route>

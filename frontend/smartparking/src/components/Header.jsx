@@ -1,29 +1,28 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTheme } from "../hooks/useTheme";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Switch, Dropdown, message, Drawer, Button } from 'antd';
 import { MoonOutlined, SunOutlined, SearchOutlined, MenuOutlined } from '@ant-design/icons';
 import Logo from '../assets/S.png';
 import { useAuth } from "../hooks/useAuth";
+import { getAllParkingLot } from "../services/ParkingLotService"; 
+import ImgBg1 from "../assets/errorImg.jpg";
 
 const Header = () => {
     const { theme, setTheme } = useTheme();
     const navigate = useNavigate();
     const { logout } = useAuth();
+
     const [open, setOpen] = useState(false);
+    const [searchValue, setSearchValue] = useState('');
+    const [searchResult, setSearchResult] = useState([]);
 
-    const showDrawer = () => {
-        setOpen(true);
-    };
-
-    const onClose = () => {
-        setOpen(false);
-    };
+    const showDrawer = () => setOpen(true);
+    const onClose = () => setOpen(false);
 
     const accountItems = [
         { label: "Thông tin cá nhân", key: '1' },
-        // { label: <NavLink to="/subcription">Gói hội viên</NavLink>, key: '2' },
-        { label: <NavLink to="/history_booking">Lịch sử đặt chỗ</NavLink>, key: '3' },
+        { label: <NavLink to="/user/history">Lịch sử đặt chỗ</NavLink>, key: '3' },
         { label: 'Thông báo', key: '4' },
         { label: 'Đăng xuất', key: '5' },
     ];
@@ -36,54 +35,94 @@ const Header = () => {
             case '5':
                 logout();
                 message.success("Đăng xuất thành công");
+                break;
+            default:
+                break;
         }
     };
+
+    useEffect(() => {
+        const delayDebounce = setTimeout(() => {
+            if (searchValue.trim() === "") {
+                setSearchResult([]);
+                return;
+            }
+
+            getAllParkingLot({ name: searchValue, page: 0, size: 5 })
+                .then(res => {
+                    setSearchResult(res.data.listDTO || []);
+                })
+                .catch(() => {
+                    message.error("Lỗi khi tìm kiếm bãi đỗ");
+                    setSearchResult([]);
+                });
+        }, 500);
+
+        return () => clearTimeout(delayDebounce);
+    }, [searchValue]);
 
     return (
         <header className={`fixed top-0 w-full z-50 transition-colors duration-300 ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-black'} shadow-md`}>
             <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-
                 <div className="flex items-center space-x-10">
                     <NavLink to="/" className="flex items-center space-x-2">
                         <img src={Logo} alt="Logo" className="w-10 h-auto" />
                     </NavLink>
                     <div className="hidden md:flex items-center space-x-6">
-                        <NavLink to="/solutions" className="cursor-pointer flex items-center hover:text-green-600 transition-colors">
-                            <span>Giải pháp</span>
-                        </NavLink>
-                        <NavLink to="/technologies" className="cursor-pointer flex items-center hover:text-green-600 transition-colors">
-                            <span>Công nghệ</span>
-                        </NavLink>
-                        <NavLink to="/news" className="cursor-pointer flex items-center hover:text-green-600 transition-colors">
-                            <span>Tin tức</span>
-                        </NavLink>
-                        <NavLink to="/contact" className="cursor-pointer flex items-center hover:text-green-600 transition-colors">
-                            <span>Liên hệ</span>
-                        </NavLink>
+                        <NavLink to="/solutions" className="hover:text-green-600">Giải pháp</NavLink>
+                        <NavLink to="/technologies" className="hover:text-green-600">Công nghệ</NavLink>
+                        <NavLink to="/news" className="hover:text-green-600">Tin tức</NavLink>
+                        <NavLink to="/contact" className="hover:text-green-600">Liên hệ</NavLink>
                         <NavLink to="/parking_lots">
-                            <button className="cursor-pointer bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition-colors">
+                            <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
                                 Đặt chỗ ngay
                             </button>
                         </NavLink>
                     </div>
                 </div>
 
-                <div className="hidden md:flex items-center space-x-6 ml-auto">
+                <div className="hidden md:flex items-center space-x-6 ml-auto relative">
                     <div className="relative">
                         <input
                             type="text"
-                            placeholder="Tìm kiếm..."
-                            className="border border-gray-300 rounded px-3 py-1 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200 w-48"
+                            value={searchValue}
+                            onChange={(e) => setSearchValue(e.target.value)}
+                            placeholder="Tìm bãi đỗ xe..."
+                            className="border border-gray-300 rounded px-3 py-1 focus:outline-none focus:ring-2 focus:ring-green-500 w-64"
                         />
                         <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
                             <SearchOutlined />
                         </span>
+
+                        {searchResult.length > 0 && (
+                            <ul className="absolute top-full left-0 mt-2 z-50 bg-white shadow-lg rounded w-72 max-h-72 overflow-y-auto">
+                                {searchResult.map((lot) => (
+                                    <li
+                                        key={lot.id}
+                                        className="p-2 border-b cursor-pointer hover:bg-green-100 flex"
+                                        onClick={() => {
+                                            navigate(`/parking_lots/${lot.id}`);
+                                            setSearchResult([]);
+                                            setSearchValue("");
+                                        }}
+                                    >
+                                        <img
+                                            src={lot.images?.length > 0 ? lot.images[0].url : ImgBg1}
+                                            alt={lot.name}
+                                            className="w-14 h-14 object-cover rounded mr-2"
+                                        />
+                                        <div>
+                                            <p className="font-semibold">{lot.name}</p>
+                                            <p className="text-sm text-gray-500">{lot.address}</p>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
                     </div>
 
                     <Dropdown menu={{ items: accountItems, onClick }} placement="bottomRight" arrow>
-                        <div className="cursor-pointer flex items-center hover:text-green-600 transition-colors">
-                            <span>Tài khoản</span>
-                        </div>
+                        <div className="cursor-pointer hover:text-green-600">Tài khoản</div>
                     </Dropdown>
 
                     <Switch
@@ -96,63 +135,19 @@ const Header = () => {
                 </div>
 
                 <div className="md:hidden ml-auto">
-                    <Button
-                        type="text"
-                        icon={<MenuOutlined />}
-                        onClick={showDrawer}
-                        className="text-xl"
-                    />
+                    <Button type="text" icon={<MenuOutlined />} onClick={showDrawer} className="text-xl" />
                 </div>
             </div>
 
             <Drawer
                 title="Menu"
                 placement="right"
-                closable={true}
                 onClose={onClose}
                 width={250}
                 open={open}
             >
-                <NavLink to="/solutions" className="block py-2">Giải pháp</NavLink>
-                <NavLink to="/technologies" className="block py-2">Công nghệ</NavLink>
-                <NavLink to="/news" className="block py-2">Tin tức</NavLink>
-                <NavLink to="/contact" className="block py-2">Liên hệ</NavLink>
-                <NavLink to="/parking-lots" className="block py-2">
-                    <button className="cursor-pointer bg-green-500 hover:bg-green-700 text-white px-4 py-2 rounded transition-colors w-full">
-                        Đặt chỗ ngay
-                    </button>
-                </NavLink>
-                <div className="mt-4">
-                    <div className="relative mb-4">
-                        <input
-                            type="text"
-                            placeholder="Tìm kiếm..."
-                            className="border border-gray-300 rounded px-3 py-1 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200 w-full"
-                        />
-                        <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                            <SearchOutlined />
-                        </span>
-                    </div>
-
-                    <Dropdown menu={{ items: accountItems, onClick }} placement="bottomRight" arrow>
-                        <div className="cursor-pointer flex items-center hover:text-green-600 transition-colors">
-                            <span>Tài khoản</span>
-                        </div>
-                    </Dropdown>
-
-                    <div className="flex items-center justify-between mt-4">
-                        <span>Chế độ tối:</span>
-                        <Switch
-                            checked={theme === 'dark'}
-                            onChange={(checked) => setTheme(checked ? 'dark' : 'light')}
-                            checkedChildren={<MoonOutlined />}
-                            unCheckedChildren={<SunOutlined />}
-                        />
-                    </div>
-                </div>
             </Drawer>
         </header>
-
     );
 };
 

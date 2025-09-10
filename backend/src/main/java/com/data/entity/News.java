@@ -1,5 +1,6 @@
 package com.data.entity;
 
+import com.data.enums.NewsCategory;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -32,4 +33,7 @@ public class News {
     @ManyToOne
     @JoinColumn(name = "posted_by", nullable = false)
     User postedBy;
+
+    @Enumerated(EnumType.STRING)
+    NewsCategory newsCategory;
 }

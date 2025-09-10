@@ -25,8 +25,11 @@ public class VehicleEntryLog {
     @Column(name = "license_plate", nullable = false)
     String licensePlate;
 
-    @Column(name = "timestamp", nullable = false)
-    LocalDateTime timestamp;
+    @Column(name = "entry_time")
+    LocalDateTime entryTime;
+
+    @Column(name = "exit_time")
+    LocalDateTime exitTime;
 
     @Enumerated(EnumType.STRING)
     VehicleEntryStatus status;
@@ -44,4 +47,7 @@ public class VehicleEntryLog {
 
     @Column(name = "device_ip")
     String deviceIp;
+
+    @Column(name = "note")
+    String note;
 }
