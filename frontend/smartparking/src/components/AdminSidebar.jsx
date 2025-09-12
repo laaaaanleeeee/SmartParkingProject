@@ -17,7 +17,7 @@ const menuItems = [
   { to: "/admin/manage_bookings", label: "Bookings", icon: <Building2 size={20} /> },
   { to: "/admin/manage_news", label: "News", icon: <CalendarDays size={20} /> },
   { to: "/admin/manage_sensors", label: "Sensors", icon: <CreditCard size={20} /> },
-  { to: "/admin/chat", label: "Chat", icon: <BarChart2 size={20} /> },
+  { to: "/admin/admin_chatbox", label: "Chat", icon: <BarChart2 size={20} /> },
 ];
 
 const AdminSidebar = () => {

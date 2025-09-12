@@ -12,4 +12,5 @@ public class NewsRequestDTO {
     String content;
     Long postedById;
     NewsCategory newsCategory;
+    String imageUrl;
 }

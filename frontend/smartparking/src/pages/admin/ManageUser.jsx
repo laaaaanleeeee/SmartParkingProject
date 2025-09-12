@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Table, message, Button, Modal, Form, Input, Select, Popconfirm } from "antd";
 import { getAllUsers, createUser, deleteUser, updateUser } from "../../services/UserService";
+import { useTheme } from "../../hooks/useTheme";
 
 const { Option } = Select;
 
@@ -16,6 +17,12 @@ const ManageUser = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [form] = Form.useForm();
+  const [searchForm] = Form.useForm();
+  const { theme } = useTheme();
+
+  const textClass = theme === "dark" ? "text-gray-200" : "text-gray-800";
+  const bgClass = theme === "dark" ? "bg-gray-900" : "bg-white";
+  const tableRowClass = theme === "dark" ? "bg-gray-800 text-green-500" : "bg-white text-gray-800";
 
   const fetchUsers = async (page = 1, size = 10, filters = {}) => {
     try {
@@ -34,7 +41,6 @@ const ManageUser = () => {
       setLoading(false);
     }
   };
-
 
   useEffect(() => {
     fetchUsers(pagination.current, pagination.pageSize);
@@ -104,27 +110,36 @@ const ManageUser = () => {
   ];
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-xl font-bold">Manage Users</h1>
+    <div className="p-6 rounded-lg shadow">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Manage Users</h1>
         <Button type="primary" onClick={handleAdd}>Add User</Button>
       </div>
-      <Form layout="inline" onFinish={(values) => fetchUsers(1, pagination.pageSize, values)}>
-        <Form.Item name="username" label="Username">
-          <Input placeholder="Search username" />
-        </Form.Item>
-        <Form.Item name="email" label="Email">
-          <Input placeholder="Search email" />
-        </Form.Item>
-        <Form.Item name="fullName" label="Full Name">
-          <Input placeholder="Search full name" />
-        </Form.Item>
-        <Form.Item>
-          <Button type="primary" htmlType="submit">Search</Button>
-        </Form.Item>
-      </Form>
+
+      <div className="mb-6">
+        <Form
+          form={searchForm}
+          layout="inline"
+          className="flex flex-wrap gap-4"
+          onFinish={(values) => fetchUsers(1, pagination.pageSize, values)}
+        >
+          <Form.Item name="username" label="Username">
+            <Input placeholder="Search username" allowClear />
+          </Form.Item>
+          <Form.Item name="email" label="Email">
+            <Input placeholder="Search email" allowClear />
+          </Form.Item>
+          <Form.Item name="fullName" label="Full Name">
+            <Input placeholder="Search full name" allowClear />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit">Search</Button>
+          </Form.Item>
+        </Form>
+      </div>
 
       <Table
+        bordered
         loading={loading}
         columns={columns}
         dataSource={users}
@@ -135,6 +150,8 @@ const ManageUser = () => {
           total: pagination.total,
           onChange: (page, pageSize) => fetchUsers(page, pageSize),
         }}
+        className={`${bgClass} ${textClass}`}
+        rowClassName={() => tableRowClass}
       />
 
       <Modal

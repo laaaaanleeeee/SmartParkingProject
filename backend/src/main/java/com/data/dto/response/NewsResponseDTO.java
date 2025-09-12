@@ -14,4 +14,5 @@ public class NewsResponseDTO {
      String postedAt;
      UserResponseDTO postedBy;
      NewsCategory newsCategory;
+     String imageUrl;
 }

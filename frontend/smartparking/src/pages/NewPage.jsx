@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, message, Modal } from "antd";
+import { Button, message, Modal, Tabs, FloatButton } from "antd";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import { useTheme } from "../hooks/useTheme";
@@ -8,7 +8,7 @@ import {
   getNewsById,
   getNewsByCategory,
 } from "../services/NewsService";
-import { FloatButton } from "antd";
+import Img1 from "../assets/parkinglotimg.jpg";
 
 const NewsPage = () => {
   const { theme } = useTheme();
@@ -20,8 +20,14 @@ const NewsPage = () => {
   const [updateNews, setUpdateNews] = useState([]);
   const [otherNews, setOtherNews] = useState([]);
 
+  const [activeKey, setActiveKey] = useState("tech");
+
   const [selectedNews, setSelectedNews] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const sectionBg = isDark
+    ? "bg-gray-900"
+    : "bg-gradient-to-br from-blue-50 via-green-50 to-blue-100";
 
   useEffect(() => {
     const fetchNews = async () => {
@@ -61,64 +67,106 @@ const NewsPage = () => {
     setSelectedNews(null);
   };
 
-  const Section = ({ title, items }) => (
-    <div className="mb-10">
-      <h3
-        className={`text-2xl font-bold mb-4 ${
-          isDark ? "text-white" : "text-green-600"
-        }`}
-      >
-        {title}
-      </h3>
-      {items.length === 0 ? (
-        <p className="text-gray-500">Không có tin tức nào.</p>
-      ) : (
-        <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
-          {items.map((item) => (
+  const HeroSection = () => {
+    if (newestNews.length === 0) return null;
+    const [main, ...others] = newestNews.slice(0, 3);
+
+    return (
+      <div className="grid md:grid-cols-3 gap-6 mb-16">
+        <div
+          onClick={() => handleViewDetail(main.id)}
+          className="md:col-span-2 relative rounded-xl overflow-hidden shadow-lg cursor-pointer group"
+        >
+          <img
+            src={Img1}
+            alt={main.title}
+            className="w-full h-96 object-cover group-hover:scale-105 transition"
+          />
+          <div className="absolute bottom-0 bg-gradient-to-t from-black/70 to-transparent p-6">
+            <h2 className="text-2xl md:text-3xl font-bold text-white">
+              {main.title}
+            </h2>
+            <p className="text-gray-200 mt-2 line-clamp-3">{main.content}</p>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-6">
+          {others.map((item) => (
             <div
               key={item.id}
-              className={`min-w-[280px] max-w-[280px] flex-shrink-0 rounded-xl shadow-md transition cursor-pointer 
-              ${
-                isDark
-                  ? "bg-gray-700 text-white hover:shadow-lg"
-                  : "bg-white text-black border border-gray-200 hover:border-green-400"
-              }`}
+              onClick={() => handleViewDetail(item.id)}
+              className={`flex gap-4 items-center rounded-lg overflow-hidden shadow-md cursor-pointer group ${isDark ? "bg-gray-800 text-white" : "bg-white"
+                }`}
             >
-              <div className="p-4">
-                <h4 className="text-lg font-semibold line-clamp-2">
+              <img
+                src={Img1}
+                alt={item.title}
+                className="w-28 h-28 object-cover"
+              />
+              <div className="p-2">
+                <h4 className="font-semibold text-sm line-clamp-2 group-hover:text-green-600">
                   {item.title}
                 </h4>
-                <p className="text-sm mt-2 text-gray-600 dark:text-gray-300 line-clamp-3">
-                  {item.content}
+                <p className="text-xs text-gray-500 mt-1">
+                  {format(new Date(item.postedAt), "dd/MM/yyyy", { locale: vi })}
                 </p>
-                <div className="mt-3">
-                  <Button
-                    size="small"
-                    style={
-                      isDark
-                        ? {}
-                        : {
-                            backgroundColor: "#22c55e",
-                            borderColor: "#22c55e",
-                            color: "#fff",
-                          }
-                    }
-                    onClick={() => handleViewDetail(item.id)}
-                  >
-                    Xem chi tiết
-                  </Button>
-                </div>
               </div>
             </div>
           ))}
         </div>
-      )}
+      </div>
+    );
+  };
+
+  const Section = ({ items }) => (
+    <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-8">
+      {items.map((item) => (
+        <div
+          key={item.id}
+          onClick={() => handleViewDetail(item.id)}
+          className={`rounded-xl overflow-hidden shadow-md cursor-pointer group 
+            ${isDark ? "bg-gray-800 text-white" : "bg-white"}
+            transition transform hover:-translate-y-1 hover:shadow-xl`}
+        >
+          <img
+            src={Img1}
+            alt={item.title}
+            className="w-full h-40 object-cover group-hover:scale-105 transition"
+          />
+          <div className="p-4">
+            <h4 className="text-lg font-semibold line-clamp-2 group-hover:text-green-500">
+              {item.title}
+            </h4>
+            <p className="text-xs text-gray-400 mt-1">
+              {format(new Date(item.postedAt), "dd/MM/yyyy", { locale: vi })}
+            </p>
+            <p className="text-sm mt-2 text-gray-600 dark:text-gray-300 line-clamp-3">
+              {item.content}
+            </p>
+          </div>
+        </div>
+      ))}
     </div>
   );
 
+  const renderLabel = (key, text) => {
+    const isActive = activeKey === key;
+    return (
+      <span
+        className={
+          isActive
+            ? `${isDark ? "text-blue-400" : "text-blue-600"} font-semibold`
+            : `${isDark ? "text-gray-400" : "text-gray-500"}`
+        }
+      >
+        {text}
+      </span>
+    );
+  };
+
   return (
-    <div>
-      <div className="py-20 text-center bg-gradient-to-r from-green-400 to-blue-500 text-white">
+    <div className={`${sectionBg}`}>
+      <div className="py-20 text-center bg-gradient-to-r from-green-500 to-blue-500 text-white">
         <h1 className="text-4xl md:text-5xl font-extrabold mb-4 drop-shadow-lg">
           Tin tức
         </h1>
@@ -128,18 +176,24 @@ const NewsPage = () => {
         </p>
       </div>
 
-      <div className="space-y-32 py-20 max-w-7xl mx-auto px-6">
-        <Section title="Tin tức mới nhất" items={newestNews} />
-        <Section title="Tin tức công nghệ" items={techNews} />
-        <Section title="Tin tức khuyến mãi" items={promoNews} />
-        <Section title="Tin tức cập nhật bãi đỗ" items={updateNews} />
-        <Section title="Tin tức khác" items={otherNews} />
+      <div className="max-w-7xl mx-auto px-6 py-16">
+        <HeroSection />
+
+        <Tabs
+          activeKey={activeKey}
+          onChange={setActiveKey}
+          centered
+          items={[
+            { key: "tech", label: renderLabel("tech", "Công nghệ"), children: <Section items={techNews} /> },
+            { key: "promo", label: renderLabel("promo", "Khuyến mãi"), children: <Section items={promoNews} /> },
+            { key: "update", label: renderLabel("update", "Cập nhật bãi đỗ"), children: <Section items={updateNews} /> },
+            { key: "other", label: renderLabel("other", "Khác"), children: <Section items={otherNews} /> },
+          ]}
+        />
       </div>
 
       <Modal
-        title={
-          <span className="text-black font-bold">{selectedNews?.title}</span>
-        }
+        title={<span className="text-black font-bold">{selectedNews?.title}</span>}
         open={isModalVisible}
         onCancel={handleCloseModal}
         footer={[

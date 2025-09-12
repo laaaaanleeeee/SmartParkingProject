@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Table, message, Button, Modal, Form, Input, Select, Popconfirm } from "antd";
 import { getAllBookings, adminCreateBooking, adminUpdateBooking, adminDeleteBooking } from "../../services/BookingService";
+import { useTheme } from "../../hooks/useTheme";
 
 const { Option } = Select;
 
@@ -16,6 +17,11 @@ const ManageBooking = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBooking, setEditingBooking] = useState(null);
   const [form] = Form.useForm();
+  const { theme } = useTheme();
+
+  const textClass = theme === "dark" ? "text-gray-200" : "text-gray-800";
+  const bgClass = theme === "dark" ? "bg-gray-900" : "bg-white";
+  const tableRowClass = theme === "dark" ? "bg-gray-800 text-green-500" : "bg-white text-gray-800";
 
   const fetchBookings = async (page = 1, size = 10, filters = {}) => {
     try {
@@ -83,18 +89,14 @@ const ManageBooking = () => {
   const columns = [
     { title: "ID", dataIndex: "id", key: "id" },
     { title: "User ID", dataIndex: "userId", key: "userId" },
-    { title: "Parking Lot ID", dataIndex: "parkingLotId", key: "parkingLotId" },
+    { title: "Lot ID", dataIndex: "parkingLotId", key: "parkingLotId" },
     { title: "Slot ID", dataIndex: "parkingSlotId", key: "parkingSlotId" },
     { title: "Vehicle ID", dataIndex: "vehicleId", key: "vehicleId" },
     { title: "Status", dataIndex: "bookingStatus", key: "bookingStatus" },
     { title: "Total Price", dataIndex: "totalPrice", key: "totalPrice" },
-    { title: "Start Time", dataIndex: "startTime", key: "startTime" },
-    { title: "End Time", dataIndex: "endTime", key: "endTime" },
-    { title: "Created At", dataIndex: "createdAt", key: "createdAt" },
-    { title: "Updated At", dataIndex: "updatedAt", key: "updatedAt" },
-    { title: "Cancelled At", dataIndex: "cancelledAt", key: "cancelledAt" },
-    { title: "Expire At", dataIndex: "expireAt", key: "expireAt" },
-    { title: "Cancellation Reason", dataIndex: "cancellationReason", key: "cancellationReason" },
+    { title: "Start", dataIndex: "startTime", key: "startTime" },
+    { title: "End", dataIndex: "endTime", key: "endTime" },
+    { title: "Created", dataIndex: "createdAt", key: "createdAt" },
     {
       title: "Action",
       key: "action",
@@ -109,31 +111,33 @@ const ManageBooking = () => {
     },
   ];
 
-
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-xl font-bold">Manage Bookings</h1>
         <Button type="primary" onClick={handleAdd}>Add Booking</Button>
       </div>
-      <Form layout="inline" onFinish={(values) => fetchBookings(1, pagination.pageSize, values)}>
-        <Form.Item name="username" label="Username">
-          <Input placeholder="Search username" />
-        </Form.Item>
-        <Form.Item name="status" label="Status">
-          <Select allowClear style={{ width: 150 }}>
-            <Option value="PENDING">PENDING</Option>
-            <Option value="CONFIRMED">CONFIRMED</Option>
-            <Option value="CANCELLED">CANCELLED</Option>
-          </Select>
-        </Form.Item>
-        <Form.Item name="lotId" label="Lot ID">
-          <Input placeholder="Search lot id" />
-        </Form.Item>
-        <Form.Item>
-          <Button type="primary" htmlType="submit">Search</Button>
-        </Form.Item>
-      </Form>
+
+      <div className="mb-6">
+        <Form layout="inline" onFinish={(values) => fetchBookings(1, pagination.pageSize, values)} className="mb-4">
+          <Form.Item name="username" label="Username">
+            <Input placeholder="Search username" />
+          </Form.Item>
+          <Form.Item name="status" label="Status">
+            <Select allowClear style={{ width: 150 }}>
+              <Option value="PENDING">PENDING</Option>
+              <Option value="CONFIRMED">CONFIRMED</Option>
+              <Option value="CANCELLED">CANCELLED</Option>
+            </Select>
+          </Form.Item>
+          <Form.Item name="lotId" label="Lot ID">
+            <Input placeholder="Search lot id" />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit">Search</Button>
+          </Form.Item>
+        </Form>
+      </div>
 
       <Table
         loading={loading}
@@ -146,6 +150,9 @@ const ManageBooking = () => {
           total: pagination.total,
           onChange: (page, pageSize) => fetchBookings(page, pageSize),
         }}
+        className={`${bgClass} ${textClass}`}
+        rowClassName={() => tableRowClass}
+        bordered
       />
 
       <Modal

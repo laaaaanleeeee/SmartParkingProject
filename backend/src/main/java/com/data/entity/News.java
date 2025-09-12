@@ -36,4 +36,7 @@ public class News {
 
     @Enumerated(EnumType.STRING)
     NewsCategory newsCategory;
+
+    @Column(name = "image_url")
+    String imageUrl;
 }

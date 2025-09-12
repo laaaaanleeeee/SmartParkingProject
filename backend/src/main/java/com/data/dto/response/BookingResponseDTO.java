@@ -27,6 +27,7 @@ public class BookingResponseDTO {
     String cancelledAt;
     String expireAt;
     String cancellationReason;
+    String address;
 
     public BookingResponseDTO(Booking booking) {
         this.id = booking.getId();
@@ -47,5 +48,6 @@ public class BookingResponseDTO {
         this.parkingLotName = booking.getParkingLot() != null? booking.getParkingLot().getName() : null;
         this.slotName = booking.getParkingSlot() != null? booking.getParkingSlot().getSlotNumber() : null;
         this.userName = booking.getUser() != null? booking.getUser().getFullName() : null;
+        this.address = booking.getParkingLot() != null? booking.getParkingLot().getAddress() : null;
     }
 }

@@ -1,9 +1,8 @@
 import { } from 'react'
 import { Navigate } from 'react-router-dom'
 import './App.css'
-import MainLayout from './layout/MainLayout'
 import { Route, Routes } from 'react-router-dom'
-import HomePage from './pages/HomePage'
+import HomePage from './pages/HomePage';
 import ParkingLotPage from './pages/ParkingLotPage';
 import NewPage from './pages/NewPage';
 import ContactPage from './pages/ContactPage';
@@ -31,10 +30,12 @@ import OwnerParkingLotsPage from './pages/owner/OwnerParkingLotsPage.jsx';
 import OwnerRevenuePage from './pages/owner/OwnerRevenuePage.jsx';
 import OwnerNotificationPage from './pages/owner/OwnerNotificationPage.jsx';
 import DetectVehiclesPage from './pages/owner/DetectVehiclesPage.jsx';
-import ChatPage from './pages/owner/ChatPage.jsx'
+import ChatPage from './pages/owner/ChatPage.jsx';
 import PersonalInfo from './components/PersonalInfo.jsx';
 import BookingHistory from './components/BookingHistory.jsx';
 import MyVehicles from './components/MyVehicles.jsx';
+import AdminChatBox from './pages/admin/AdminChatBox.jsx';
+import OwnerChatBox from './pages/owner/OwnerChatBox.jsx';
 
 function App() {
   return (
@@ -70,6 +71,7 @@ function App() {
           <Route path='manage_bookings' element={<ManageBooking />} />
           <Route path='manage_news' element={<ManageNews />} />
           <Route path='manage_sensors' element={<ManageSensor />} />
+          <Route path='admin_chatbox' element={<AdminChatBox />} />
         </Route>
 
         <Route path='owner'>
@@ -80,7 +82,7 @@ function App() {
           <Route path='owner_revenue' element={<OwnerRevenuePage />} />
           <Route path='owner_notification' element={<OwnerNotificationPage />} />
           <Route path='owner_detect_vehicles' element={<DetectVehiclesPage />} />
-          <Route path='owner_chat' element={<ChatPage />} />
+          <Route path='owner_chatbox' element={<OwnerChatBox />} />
         </Route>
       </Route>
     </Routes>

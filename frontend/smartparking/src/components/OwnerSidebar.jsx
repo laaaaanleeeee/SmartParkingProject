@@ -19,7 +19,7 @@ const menuItems = [
   { to: "/owner/owner_revenue", label: "Revenue", icon: <BarChart2 size={20} /> },
   { to: "/owner/owner_notification", label: "Notifications", icon: <Bell size={20} /> },
   { to: "/owner/owner_detect_vehicles", label: "Detect Vehicle", icon: <Bell size={20} /> },
-  { to: "/owner/owner_chat", label: "Chat", icon: <Bell size={20} /> },
+  { to: "/owner/owner_chatbox", label: "Chat", icon: <Bell size={20} /> },
 ];
 
 const OwnerSidebar = () => {

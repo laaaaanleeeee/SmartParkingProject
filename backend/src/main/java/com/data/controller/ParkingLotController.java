@@ -103,4 +103,45 @@ public class ParkingLotController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/admin/getAll")
+    public ResponseEntity<PageDTO<ParkingLotResponseDTO>> adminGetAllParkingLots(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) String ward,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false) Double minRating,
+            @RequestParam(required = false) Integer minSlots,
+            @PageableDefault(size = 10, sort = "id") Pageable pageable
+    ) {
+        return ResponseEntity.ok(
+                parkingLotService.getAllParkingLots(name, city, ward, minPrice, maxPrice, minRating, minSlots, pageable)
+        );
+    }
+
+    @GetMapping("admin/getById/{id}")
+    public ResponseEntity<ParkingLotResponseDTO> adminGetParkingLotById(@PathVariable Long id) {
+        ParkingLotResponseDTO parkingLot = parkingLotService.getParkingLotById(id);
+        return parkingLot != null ? ResponseEntity.ok(parkingLot) : ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/admin/create")
+    public ResponseEntity<ParkingLotResponseDTO> adminCreateParkingLot(@RequestBody @Valid ParkingLotRequestDTO dto) {
+        return new ResponseEntity<>(parkingLotService.createParkingLot(dto), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/admin/update/{id}")
+    public ResponseEntity<ParkingLotResponseDTO> adminUpdateParkingLot(
+            @PathVariable Long id,
+            @RequestBody @Valid ParkingLotRequestDTO dto
+    ) {
+        return ResponseEntity.ok(parkingLotService.updateParkingLot(id, dto));
+    }
+
+    @DeleteMapping("/admin/delete/{id}")
+    public ResponseEntity<Void> adminDeleteParkingLot(@PathVariable Long id) {
+        parkingLotService.deleteParkingLot(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }

@@ -6,7 +6,7 @@ import Img1 from "../assets/camera.jpg";
 import Img2 from "../assets/barrier.png";
 import Img3 from "../assets/ovs.jpg";
 import Img4 from "../assets/webapp.jpg";
-import { FloatButton } from 'antd';
+import { FloatButton } from "antd";
 
 const technologies = [
   {
@@ -61,61 +61,62 @@ const technologies = [
 
 const TechnologyPage = () => {
   const { theme } = useTheme();
-  const textClass = theme === "dark" ? "text-white" : "text-gray-900";
+  const textClass = theme === "dark" ? "text-gray-100" : "text-gray-900";
+  const sectionBg =
+    theme === "dark"
+      ? "bg-gray-900"
+      : "bg-gradient-to-br from-blue-50 via-green-50 to-blue-100";
 
   return (
-    <section className="min-h-screen">
-      <div className="py-20 text-center bg-gradient-to-r from-green-400 to-blue-500 text-white">
+    <section className={`min-h-screen ${sectionBg}`}>
+      <div className="py-20 text-center bg-gradient-to-r from-blue-500 to-green-500 text-white">
         <h1 className="text-4xl md:text-5xl font-extrabold mb-4 drop-shadow-lg">
           Công nghệ trong Smart Parking
         </h1>
         <p className="text-lg md:text-xl max-w-2xl mx-auto opacity-90">
-          Hệ thống Smart Parking áp dụng loạt công nghệ hiện đại để tối ưu việc quản lý và trải nghiệm của người dùng.
+          Smart Parking ứng dụng các công nghệ tiên tiến để nâng cao trải nghiệm và tối ưu hóa quản lý bãi đỗ.
         </p>
       </div>
 
-      <div className="space-y-32 py-20 max-w-7xl mx-auto px-6">
+      <div className="grid md:grid-cols-2 gap-16 py-20 max-w-7xl mx-auto px-6">
         {technologies.map((tech, idx) => (
           <div
             key={idx}
-            className={`flex flex-col md:flex-row items-center gap-12 ${
-              idx % 2 === 1 ? "md:flex-row-reverse" : ""
-            }`}
+            className="rounded-2xl shadow-lg overflow-hidden transform hover:scale-105 transition-all duration-300"
           >
-            <div className="md:w-1/2 relative group">
-              <Atropos
-                className="rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-500 group-hover:scale-105"
-                rotateXMax={15}
-                rotateYMax={15}
-              >
-                <img
-                  src={tech.img}
-                  alt={tech.title}
-                  className="rounded-xl w-full h-80 object-cover"
-                />
-              </Atropos>
-            </div>
+            <Atropos className="h-60 overflow-hidden">
+              <img
+                src={tech.img}
+                alt={tech.title}
+                className="w-full h-60 object-cover"
+              />
+            </Atropos>
 
-            <div className={`md:w-1/2 space-y-6 ${textClass}`}>
-              <h2 className="text-3xl font-bold hover:text-green-500 transition-colors duration-300">
+            <div className={`p-8 space-y-6 ${textClass}`}>
+              <h2 className="text-2xl font-bold hover:text-green-500 transition-colors">
                 {tech.title}
               </h2>
-              <ul className="list-disc pl-5 space-y-2">
+
+              <ul className="list-disc pl-5 space-y-2 text-base leading-relaxed">
                 {tech.details.map((d, i) => (
                   <li key={i}>{d}</li>
                 ))}
               </ul>
 
               <div>
-                <h3 className="text-xl font-semibold mb-2">Cách hoạt động:</h3>
+                <h3 className="text-lg font-semibold mb-2">Cách hoạt động:</h3>
                 <p className="opacity-80">{tech.howItWorks}</p>
               </div>
 
               <div>
-                <h3 className="text-xl font-semibold mb-2">Lợi ích:</h3>
+                <h3 className="text-lg font-semibold mb-2">Lợi ích:</h3>
                 <div className="flex flex-wrap gap-2">
                   {tech.benefits.map((b, i) => (
-                    <Tag color="green" key={i} className="text-base px-3 py-1 rounded-full">
+                    <Tag
+                      color="green"
+                      key={i}
+                      className="rounded-full px-3 py-1 text-sm font-medium"
+                    >
                       {b}
                     </Tag>
                   ))}
@@ -125,6 +126,7 @@ const TechnologyPage = () => {
           </div>
         ))}
       </div>
+
       <FloatButton.BackTop />
     </section>
   );

@@ -129,7 +129,7 @@ const SolutionPage = () => {
 
   return (
     <section className={`min-h-screen ${sectionBg}`}>
-      <div className="py-20 text-center bg-gradient-to-r from-green-400 to-blue-500 text-white">
+      <div className="py-20 text-center bg-gradient-to-r from-green-500 to-blue-500 text-white">
         <h1 className="text-4xl md:text-5xl font-extrabold mb-4 drop-shadow-lg">
           Giải pháp Smart Parking
         </h1>

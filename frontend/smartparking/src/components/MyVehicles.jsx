@@ -5,12 +5,13 @@ import {
   createVehicle,
   updateVehicle,
 } from "../services/VehicleService";
-import { message, Table, Button, Drawer, Form, Input, Select } from "antd";
+import { message, Button, Drawer, Form, Input, Select, Card } from "antd";
+import { CarOutlined } from "@ant-design/icons";
 import { useTheme } from "../hooks/useTheme";
 
 const { Option } = Select;
 
-const VehiclesInfo = () => {
+const MyVehicles = () => {
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -20,7 +21,10 @@ const VehiclesInfo = () => {
 
   const textClass = theme === "dark" ? "text-gray-200" : "text-gray-800";
   const bgClass = theme === "dark" ? "bg-gray-900" : "bg-white";
-  const tableRowClass = theme === "dark" ? "bg-gray-800 text-green-500" : "bg-white text-gray-800";
+  const cardClass =
+    theme === "dark"
+      ? "bg-gray-800 text-green-400 shadow-lg"
+      : "bg-white text-gray-800 shadow-md";
 
   useEffect(() => {
     fetchVehicles();
@@ -78,9 +82,9 @@ const VehiclesInfo = () => {
   };
 
   return (
-    <div className={`${bgClass} p-4 rounded-lg shadow`}>
-      <div className="flex justify-between items-center mb-4">
-        <h2 className={`text-xl font-semibold ${textClass}`}>
+    <div className={`${bgClass}`}>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className={`text-xl font-bold ${textClass}`}>
           Danh sách xe của tôi
         </h2>
         <Button type="primary" onClick={openDrawerForCreate}>
@@ -88,33 +92,55 @@ const VehiclesInfo = () => {
         </Button>
       </div>
 
-      <Table
-        rowKey="id"
-        dataSource={vehicles}
-        loading={loading}
-        columns={[
-          { title: "Biển số", dataIndex: "licensePlate" },
-          { title: "Loại xe", dataIndex: "vehicleType" },
-          { title: "Hãng", dataIndex: "brand" },
-          { title: "Mẫu xe", dataIndex: "model" },
-          { title: "Màu", dataIndex: "color" },
-          { title: "Năm sản xuất", dataIndex: "manufactureYear" },
-          {
-            title: "Hành động",
-            render: (_, record) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {vehicles.map((vehicle) => (
+          <Card
+            key={vehicle.id}
+            loading={loading}
+            className={`${cardClass} rounded-xl hover:shadow-xl transition`}
+            title={
+              <span className={`flex items-center gap-2 font-semibold ${textClass}`}>
+                <CarOutlined /> {vehicle.licensePlate}
+              </span>
+            }
+            extra={
               <div className="space-x-2">
-                <Button onClick={() => openDrawerForEdit(record)}>Sửa</Button>
-                <Button danger onClick={() => handleDelete(record.id)}>
+                <Button size="small" onClick={() => openDrawerForEdit(vehicle)}>
+                  Sửa
+                </Button>
+                <Button
+                  size="small"
+                  danger
+                  onClick={() => handleDelete(vehicle.id)}
+                >
                   Xoá
                 </Button>
               </div>
-            ),
-          },
-        ]}
-        className={`${bgClass} ${textClass}`}
-        rowClassName={() => tableRowClass}
-        bordered
-      />
+            }
+            style={{
+              backgroundColor: theme === "dark" ? "#111827" : "#ffffff",
+              color: theme === "dark" ? "#e5e7eb" : "#374151",
+            }}
+          >
+            <p>
+              <b>Loại xe:</b>{" "}
+              {vehicle.vehicleType === "CAR" ? "Ô tô" : "Xe máy"}
+            </p>
+            <p>
+              <b>Hãng:</b> {vehicle.brand}
+            </p>
+            <p>
+              <b>Mẫu xe:</b> {vehicle.model}
+            </p>
+            <p>
+              <b>Màu:</b> {vehicle.color}
+            </p>
+            <p>
+              <b>Năm SX:</b> {vehicle.manufactureYear}
+            </p>
+          </Card>
+        ))}
+      </div>
 
       <Drawer
         title={
@@ -124,6 +150,7 @@ const VehiclesInfo = () => {
         }
         onClose={() => setOpen(false)}
         open={open}
+        width={400}
         className={bgClass}
         extra={
           <div>
@@ -135,6 +162,10 @@ const VehiclesInfo = () => {
             </Button>
           </div>
         }
+        style={{
+          backgroundColor: theme === "dark" ? "#111827" : "#ffffff",
+          color: theme === "dark" ? "#e5e7eb" : "#374151",
+        }}
       >
         <Form form={form} layout="vertical">
           <Form.Item
@@ -185,4 +216,4 @@ const VehiclesInfo = () => {
   );
 };
 
-export default VehiclesInfo;
+export default MyVehicles;

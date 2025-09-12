@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Table, message, Button, Modal, Form, Input, Popconfirm } from "antd";
 import { getAllNews, createNews, updateNews, deleteNews } from "../../services/NewsService";
+import { useTheme } from "../../hooks/useTheme";
 
 const ManageNews = () => {
   const [loading, setLoading] = useState(false);
@@ -14,6 +15,11 @@ const ManageNews = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingNews, setEditingNews] = useState(null);
   const [form] = Form.useForm();
+  const { theme } = useTheme();
+
+  const textClass = theme === "dark" ? "text-gray-200" : "text-gray-800";
+  const bgClass = theme === "dark" ? "bg-gray-900" : "bg-white";
+  const tableRowClass = theme === "dark" ? "bg-gray-800 text-green-500" : "bg-white text-gray-800";
 
   const fetchNews = async (page = 1, size = 10, filters = {}) => {
     try {
@@ -110,18 +116,19 @@ const ManageNews = () => {
         <Button type="primary" onClick={handleAdd}>Add News</Button>
       </div>
 
-      {/* Form search/filter */}
-      <Form layout="inline" onFinish={(values) => fetchNews(1, pagination.pageSize, values)}>
-        <Form.Item name="title" label="Title">
-          <Input placeholder="Search title" />
-        </Form.Item>
-        <Form.Item name="poster" label="Posted By">
-          <Input placeholder="Search poster username" />
-        </Form.Item>
-        <Form.Item>
-          <Button type="primary" htmlType="submit">Search</Button>
-        </Form.Item>
-      </Form>
+      <div className="mb-6">
+        <Form layout="inline" onFinish={(values) => fetchNews(1, pagination.pageSize, values)} className="mb-4">
+          <Form.Item name="title" label="Title">
+            <Input placeholder="Search title" />
+          </Form.Item>
+          <Form.Item name="poster" label="Posted By">
+            <Input placeholder="Search poster username" />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit">Search</Button>
+          </Form.Item>
+        </Form>
+      </div>
 
       <Table
         loading={loading}
@@ -134,6 +141,9 @@ const ManageNews = () => {
           total: pagination.total,
           onChange: (page, pageSize) => fetchNews(page, pageSize),
         }}
+        className={`${bgClass} ${textClass}`}
+        rowClassName={() => tableRowClass}
+        bordered
       />
 
       <Modal

@@ -96,6 +96,7 @@ public class NewsService {
         dto.setPostedAt(news.getPostedAt().toString());
         dto.setPostedBy(new UserResponseDTO(news.getPostedBy()));
         dto.setNewsCategory(news.getNewsCategory());
+        dto.setImageUrl(news.getImageUrl());
         return dto;
     }
 

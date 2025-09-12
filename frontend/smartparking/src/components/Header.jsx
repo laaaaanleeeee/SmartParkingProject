@@ -21,17 +21,14 @@ const Header = () => {
     const onClose = () => setOpen(false);
 
     const accountItems = [
-        { label: "Thông tin cá nhân", key: '1' },
+        { label: <NavLink to="/user/info">Thông tin cá nhân</NavLink>, key: '1' },
         { label: <NavLink to="/user/history">Lịch sử đặt chỗ</NavLink>, key: '3' },
-        { label: 'Thông báo', key: '4' },
+        { label: <NavLink to="/user/vehicles">Xe của tôi</NavLink>, key: '4' },
         { label: 'Đăng xuất', key: '5' },
     ];
 
     const onClick = ({ key }) => {
         switch (key) {
-            case '1':
-                navigate('/user');
-                break;
             case '5':
                 logout();
                 message.success("Đăng xuất thành công");
@@ -72,7 +69,7 @@ const Header = () => {
                         <NavLink to="/solutions" className="hover:text-green-600">Giải pháp</NavLink>
                         <NavLink to="/technologies" className="hover:text-green-600">Công nghệ</NavLink>
                         <NavLink to="/news" className="hover:text-green-600">Tin tức</NavLink>
-                        <NavLink to="/contact" className="hover:text-green-600">Liên hệ</NavLink>
+                        <NavLink to="/contact" className="hover:text-green-600">Về chúng tôi</NavLink>
                         <NavLink to="/parking_lots">
                             <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
                                 Đặt chỗ ngay
@@ -112,7 +109,7 @@ const Header = () => {
                                             className="w-14 h-14 object-cover rounded mr-2"
                                         />
                                         <div>
-                                            <p className="font-semibold">{lot.name}</p>
+                                            <p className="font-semibold text-gray-500">{lot.name}</p>
                                             <p className="text-sm text-gray-500">{lot.address}</p>
                                         </div>
                                     </li>
