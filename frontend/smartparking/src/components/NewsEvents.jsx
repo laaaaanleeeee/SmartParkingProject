@@ -71,7 +71,7 @@ const NewsEvents = () => {
                     <p className={`text-sm mb-4 ${descColor}`}>
                       {item.description}
                     </p>
-                    <NavLink to={`/news/${item.id}`}>
+                    <NavLink to={`/news`}>
                       <span className="inline-block text-sm text-blue-500 hover:text-blue-600 transition-colors">
                         Xem chi tiết →
                       </span>

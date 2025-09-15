@@ -30,12 +30,12 @@ import OwnerParkingLotsPage from './pages/owner/OwnerParkingLotsPage.jsx';
 import OwnerRevenuePage from './pages/owner/OwnerRevenuePage.jsx';
 import OwnerNotificationPage from './pages/owner/OwnerNotificationPage.jsx';
 import DetectVehiclesPage from './pages/owner/DetectVehiclesPage.jsx';
-import ChatPage from './pages/owner/ChatPage.jsx';
 import PersonalInfo from './components/PersonalInfo.jsx';
 import BookingHistory from './components/BookingHistory.jsx';
 import MyVehicles from './components/MyVehicles.jsx';
 import AdminChatBox from './pages/admin/AdminChatBox.jsx';
 import OwnerChatBox from './pages/owner/OwnerChatBox.jsx';
+import NewsDetailPage from './pages/NewsDetailPage.jsx';
 
 function App() {
   return (
@@ -48,10 +48,11 @@ function App() {
         <Route path='/' element={<HomePage />} />
         <Route path='/parking_lots' element={<ParkingLotPage />}></Route>
         <Route path='/news' element={<NewPage />}></Route>
+        <Route path="/news/:id/:slug" element={<NewsDetailPage />} />
         <Route path='/solutions' element={<SolutionPage />}></Route>
         <Route path='/contact' element={<ContactPage />}></Route>
-        <Route path='/parking_lots/:id/booking' element={<PrivateRoute><BookingPage /></PrivateRoute>}></Route>
-        <Route path='/parking_lots/:id' element={<ParkingLotDetailPage />}></Route>
+        <Route path='/parking_lots/:id/:slug/booking' element={<PrivateRoute><BookingPage /></PrivateRoute>} />
+        <Route path="/parking_lots/:id/:slug" element={<ParkingLotDetailPage />} />
 
         <Route path='/user' element={<PrivateRoute><UserInfoPage /></PrivateRoute>}>
           <Route index element={<Navigate to="info" />} />

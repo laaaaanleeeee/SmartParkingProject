@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Button, message, Modal, Tabs, FloatButton } from "antd";
+import { message, Tabs, FloatButton } from "antd";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import { useTheme } from "../hooks/useTheme";
 import {
   getAllNews,
-  getNewsById,
   getNewsByCategory,
 } from "../services/NewsService";
 import Img1 from "../assets/parkinglotimg.jpg";
+import { useNavigate } from "react-router-dom";
+import { createSlug } from "../utils/Slugify";
 
 const NewsPage = () => {
   const { theme } = useTheme();
@@ -19,11 +20,8 @@ const NewsPage = () => {
   const [promoNews, setPromoNews] = useState([]);
   const [updateNews, setUpdateNews] = useState([]);
   const [otherNews, setOtherNews] = useState([]);
-
+  const navigate = useNavigate();
   const [activeKey, setActiveKey] = useState("tech");
-
-  const [selectedNews, setSelectedNews] = useState(null);
-  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const sectionBg = isDark
     ? "bg-gray-900"
@@ -51,20 +49,8 @@ const NewsPage = () => {
     fetchNews();
   }, []);
 
-  const handleViewDetail = async (id) => {
-    try {
-      const res = await getNewsById(id);
-      setSelectedNews(res.data);
-      setIsModalVisible(true);
-    } catch (err) {
-      console.error("Lỗi fetch chi tiết tin tức: ", err);
-      message.error("Không thể tải chi tiết tin tức!");
-    }
-  };
-
-  const handleCloseModal = () => {
-    setIsModalVisible(false);
-    setSelectedNews(null);
+  const handleViewDetail = (id, title) => {
+    navigate(`/news/${id}/${createSlug(title)}`);
   };
 
   const HeroSection = () => {
@@ -74,16 +60,16 @@ const NewsPage = () => {
     return (
       <div className="grid md:grid-cols-3 gap-6 mb-16">
         <div
-          onClick={() => handleViewDetail(main.id)}
+          onClick={() => handleViewDetail(main.id, main.title)}
           className="md:col-span-2 relative rounded-xl overflow-hidden shadow-lg cursor-pointer group"
         >
           <img
-            src={Img1}
+            src={main.imageUrl || Img1}
             alt={main.title}
             className="w-full h-96 object-cover group-hover:scale-105 transition"
           />
           <div className="absolute bottom-0 bg-gradient-to-t from-black/70 to-transparent p-6">
-            <h2 className="text-2xl md:text-3xl font-bold text-white">
+            <h2 className="text-2xl md:text-3xl font-bold text-white line-clamp-2">
               {main.title}
             </h2>
             <p className="text-gray-200 mt-2 line-clamp-3">{main.content}</p>
@@ -94,12 +80,12 @@ const NewsPage = () => {
           {others.map((item) => (
             <div
               key={item.id}
-              onClick={() => handleViewDetail(item.id)}
+              onClick={() => handleViewDetail(item.id, item.title)}
               className={`flex gap-4 items-center rounded-lg overflow-hidden shadow-md cursor-pointer group ${isDark ? "bg-gray-800 text-white" : "bg-white"
                 }`}
             >
               <img
-                src={Img1}
+                src={item.imageUrl || Img1}
                 alt={item.title}
                 className="w-28 h-28 object-cover"
               />
@@ -123,13 +109,13 @@ const NewsPage = () => {
       {items.map((item) => (
         <div
           key={item.id}
-          onClick={() => handleViewDetail(item.id)}
+          onClick={() => handleViewDetail(item.id, item.title)}
           className={`rounded-xl overflow-hidden shadow-md cursor-pointer group 
             ${isDark ? "bg-gray-800 text-white" : "bg-white"}
             transition transform hover:-translate-y-1 hover:shadow-xl`}
         >
           <img
-            src={Img1}
+            src={item.imageUrl || Img1}
             alt={item.title}
             className="w-full h-40 object-cover group-hover:scale-105 transition"
           />
@@ -191,35 +177,6 @@ const NewsPage = () => {
           ]}
         />
       </div>
-
-      <Modal
-        title={<span className="text-black font-bold">{selectedNews?.title}</span>}
-        open={isModalVisible}
-        onCancel={handleCloseModal}
-        footer={[
-          <Button key="close" onClick={handleCloseModal}>
-            Đóng
-          </Button>,
-        ]}
-      >
-        {selectedNews ? (
-          <div>
-            <p className="text-sm mb-2 text-gray-700">
-              Đăng bởi: {selectedNews.postedBy.fullName} (
-              {selectedNews.postedBy.username})
-            </p>
-            <p className="text-sm mb-4 text-gray-600">
-              Ngày đăng:{" "}
-              {format(new Date(selectedNews.postedAt), "dd/MM/yyyy HH:mm", {
-                locale: vi,
-              })}
-            </p>
-            <p>{selectedNews.content}</p>
-          </div>
-        ) : (
-          <p>Đang tải...</p>
-        )}
-      </Modal>
 
       <FloatButton.BackTop />
     </div>

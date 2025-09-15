@@ -1,8 +1,12 @@
 import React from "react";
-import { Tag } from "antd";
+import { FloatButton } from "antd";
 import { useTheme } from "../hooks/useTheme";
-import { FloatButton } from 'antd';
-import ImgBg1 from '../assets/parkinglotimg.jpg';
+import {
+  CheckCircleOutlined,
+  BulbOutlined,
+  StarOutlined,
+} from "@ant-design/icons";
+import ImgBg1 from "../assets/parkinglotimg.jpg";
 
 const solutions = [
   {
@@ -120,13 +124,11 @@ const solutions = [
 const SolutionPage = () => {
   const { theme } = useTheme();
   const textClass = theme === "dark" ? "text-gray-200" : "text-gray-800";
-  const cardBg =
-    theme === "dark" ? "bg-gray-800/80 border border-gray-700" : "bg-white shadow-md";
   const sectionBg =
     theme === "dark"
       ? "bg-gray-900"
       : "bg-gradient-to-br from-blue-50 via-green-50 to-blue-100";
-
+  
   return (
     <section className={`min-h-screen ${sectionBg}`}>
       <div className="py-20 text-center bg-gradient-to-r from-green-500 to-blue-500 text-white">
@@ -138,64 +140,70 @@ const SolutionPage = () => {
           mang lại.
         </p>
       </div>
-      <div className="space-y-32 py-20 max-w-7xl mx-auto px-6">
-        <div className="grid gap-12">
-          {solutions.map((sol, idx) => (
-            <div
-              key={idx}
-              className={`flex flex-col md:flex-row items-stretch gap-8 ${idx % 2 === 1 ? "md:flex-row-reverse" : ""
-                }`}
-            >
-              <div
-                className={`flex-1 p-6 rounded-2xl transition-transform duration-300 hover:-translate-y-1 ${cardBg}`}
-              >
-                <h2 className="text-2xl font-bold text-green-600 mb-4">{sol.title}</h2>
 
-                <ul className="list-disc pl-5 space-y-2 mb-6">
-                  {sol.details.map((d, i) => (
-                    <li key={i} className={`${textClass} leading-relaxed`}>
-                      {d}
-                    </li>
-                  ))}
-                </ul>
+      <div className="max-w-7xl mx-auto px-6 py-20 space-y-28">
+        {solutions.map((sol, idx) => (
+          <div
+            key={idx}
+            className={`flex flex-col md:flex-row items-center gap-10 ${
+              idx % 2 === 1 ? "md:flex-row-reverse" : ""
+            }`}
+          >
+            <div className="md:w-1/2">
+              <div className="relative rounded-2xl overflow-hidden shadow-xl group">
+                <img
+                  src={ImgBg1}
+                  alt="Smart Parking"
+                  className="w-full h-80 object-cover transform group-hover:scale-110 transition duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+              </div>
+            </div>
 
-                <div className="mb-6">
-                  <h3 className="text-lg font-semibold mb-2 text-green-500">
-                    Kịch bản hoạt động
-                  </h3>
-                  <p className={`${textClass} opacity-90 leading-relaxed`}>
-                    {sol.scenario}
-                  </p>
-                </div>
+            <div className="md:w-1/2">
+              <h2 className="text-3xl font-bold text-green-400 mb-4">
+                {sol.title}
+              </h2>
 
-                <div>
-                  <h3 className="text-lg font-semibold mb-2 text-green-500">Lợi ích</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {sol.benefits.map((b, i) => (
-                      <Tag
-                        color="blue"
-                        key={i}
-                        className="text-sm px-3 py-1 rounded-full shadow-sm"
-                      >
-                        {b}
-                      </Tag>
-                    ))}
-                  </div>
-                </div>
+              <ul className="space-y-2 mb-6">
+                {sol.details.map((d, i) => (
+                  <li
+                    key={i}
+                    className={`flex items-start gap-2 ${textClass}`}
+                  >
+                    <CheckCircleOutlined className="text-green-500 mt-1 text-lg" />
+                    <span>{d}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold flex items-center gap-2 text-blue-400">
+                  <BulbOutlined className="text-xl" /> Kịch bản hoạt động
+                </h3>
+                <p className={`${textClass} mt-2 leading-relaxed`}>
+                  {sol.scenario}
+                </p>
               </div>
 
-              <div className="flex-1 flex items-center justify-center">
-                <div className="w-full h-full rounded-2xl bg-gradient-to-tr from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center shadow-inner">
-                  <img
-                    src={ImgBg1}
-                    alt="Smart Parking"
-                    className="w-full h-full object-cover brightness-50 transform transition-transform duration-1000 hover:scale-110 rounded-2xl"
-                  />
+              <div>
+                <h3 className="text-lg font-semibold flex items-center gap-2 text-blue-400">
+                  <StarOutlined className="text-xl" /> Lợi ích
+                </h3>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {sol.benefits.map((b, i) => (
+                    <span
+                      key={i}
+                      className="px-3 py-1 bg-gradient-to-r from-green-400 to-blue-500 text-white text-sm rounded-full shadow"
+                    >
+                      {b}
+                    </span>
+                  ))}
                 </div>
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
 
       <FloatButton.BackTop />

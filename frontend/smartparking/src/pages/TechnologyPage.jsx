@@ -1,12 +1,13 @@
 import React from "react";
 import { Tag } from "antd";
-import Atropos from "atropos/react";
 import { useTheme } from "../hooks/useTheme";
 import Img1 from "../assets/camera.jpg";
 import Img2 from "../assets/barrier.png";
 import Img3 from "../assets/ovs.jpg";
 import Img4 from "../assets/webapp.jpg";
 import { FloatButton } from "antd";
+import VideoSP from "../assets/videosp.mp4";
+import Atropos from "atropos/react";
 
 const technologies = [
   {
@@ -62,6 +63,8 @@ const technologies = [
 const TechnologyPage = () => {
   const { theme } = useTheme();
   const textClass = theme === "dark" ? "text-gray-100" : "text-gray-900";
+  const cardBg =
+    theme === "dark" ? "bg-gray-800/80 border border-gray-700" : "bg-white shadow-md";
   const sectionBg =
     theme === "dark"
       ? "bg-gray-900"
@@ -78,11 +81,37 @@ const TechnologyPage = () => {
         </p>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-16 py-20 max-w-7xl mx-auto px-6">
+      <div className="grid md:grid-cols-2 gap-8 py-20 max-w-7xl mx-auto px-6 items-center">
+        <div>
+          <h2 className="text-5xl font-bold mb-6 text-green-500">Smart Park</h2>
+          <p className="text-lg leading-relaxed mb-4">
+            Hệ thống Smart Parking tích hợp nhiều công nghệ hiện đại như Camera ANPR, Barrier thông minh,
+            Cảm biến IoT và Ứng dụng/WebApp. Các thành phần này phối hợp để mang lại giải pháp đỗ xe
+            thông minh, nhanh chóng và hiệu quả.
+          </p>
+          <p className="text-lg leading-relaxed">
+            Mục tiêu là tối ưu vận hành bãi đỗ, tăng sự tiện lợi cho khách hàng, đồng thời giảm thiểu
+            chi phí quản lý và nhân sự.
+          </p>
+        </div>
+        <div className="rounded-xl shadow-lg overflow-hidden">
+          <video
+            src={VideoSP}
+            // autoPlay
+            muted
+            loop
+            controls
+            className="w-full h-72 object-cover"
+          />
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-1 gap-16 py-20 max-w-7xl mx-auto px-6">
+        <h1 className="text-3xl text-center font-bold">Lựa chọn thông minh để quản lý xe của bạn</h1>
         {technologies.map((tech, idx) => (
           <div
             key={idx}
-            className="rounded-2xl shadow-lg overflow-hidden transform hover:scale-105 transition-all duration-300"
+            className={`rounded-2xl shadow-lg overflow-hidden transform hover:scale-105 transition-all duration-300 ${cardBg}`}
           >
             <Atropos className="h-60 overflow-hidden">
               <img

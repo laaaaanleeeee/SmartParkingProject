@@ -7,6 +7,7 @@ import Logo from '../assets/S.png';
 import { useAuth } from "../hooks/useAuth";
 import { getAllParkingLot } from "../services/ParkingLotService"; 
 import ImgBg1 from "../assets/errorImg.jpg";
+import { createSlug } from "../utils/Slugify";
 
 const Header = () => {
     const { theme, setTheme } = useTheme();
@@ -71,7 +72,7 @@ const Header = () => {
                         <NavLink to="/news" className="hover:text-green-600">Tin tức</NavLink>
                         <NavLink to="/contact" className="hover:text-green-600">Về chúng tôi</NavLink>
                         <NavLink to="/parking_lots">
-                            <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
+                            <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded cursor-pointer">
                                 Đặt chỗ ngay
                             </button>
                         </NavLink>
@@ -98,7 +99,7 @@ const Header = () => {
                                         key={lot.id}
                                         className="p-2 border-b cursor-pointer hover:bg-green-100 flex"
                                         onClick={() => {
-                                            navigate(`/parking_lots/${lot.id}`);
+                                            navigate(`/parking_lots/${lot.id}/${createSlug(lot.name)}`);
                                             setSearchResult([]);
                                             setSearchValue("");
                                         }}

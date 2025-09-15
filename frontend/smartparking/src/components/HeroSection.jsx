@@ -20,14 +20,15 @@ const HeroSection = () => {
                 ))}
             </Carousel>
             <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-4">
-                <h1 className="text-4xl md:text-6xl font-extrabold mb-4 drop-shadow-lg animate-fade-in">
-                    <span className="text-green-500">Smart Park</span> – Đỗ xe thông minh, tương lai bền vững
+                <h1 className="text-5xl md:text-7xl font-extrabold mb-4 drop-shadow-lg animate-fade-in text-green-500">
+                    Smart Park
                 </h1>
-                <p className="text-lg md:text-xl max-w-3xl mx-auto mb-6">
+                <p className='text-3xl md:text-5xl font-bold drop-shadow-lg animate-fade-in mb-4'>Đỗ xe thông minh, tương lai bền vững</p>
+                <p className="text-lg md:text-xl max-w-3xl mx-auto mb-6 font-semibold">
                     Tìm chỗ đỗ nhanh chóng, an toàn và tiện lợi với công nghệ tự động nhận diện biển số và quản lý thời gian thực.
                 </p>
                 <Link to="benefits" smooth duration={600}>
-                    <button className="bg-green-500 hover:bg-green-700 text-white px-6 py-3 rounded-full text-lg transition">
+                    <button className="bg-green-500 hover:bg-green-700 text-white px-6 py-3 rounded-full text-lg transition cursor-pointer">
                         BẮT ĐẦU
                     </button>
                 </Link>

@@ -11,6 +11,7 @@ import {
   Car,
 } from "lucide-react";
 import { FloatButton } from 'antd';
+import { createSlug } from "../utils/Slugify";
 
 const ParkingLotDetailPage = () => {
   const { id } = useParams();
@@ -135,7 +136,7 @@ const ParkingLotDetailPage = () => {
 
           <button
             onClick={() =>
-              navigate(`/parking_lots/${parkingLot.id}/booking`, {
+              navigate(`/parking_lots/${parkingLot.id}/${createSlug(parkingLot.name)}/booking`, {
                 state: { parkingLot },
               })
             }
