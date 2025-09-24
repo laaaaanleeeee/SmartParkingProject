@@ -1,6 +1,6 @@
 import React from 'react';
 import { CarOutlined, SafetyOutlined, DashboardOutlined } from '@ant-design/icons';
-import { useTheme } from '../hooks/useTheme';
+import { useTheme } from '@/hooks/useTheme';
 
 const benefits = [
     {

@@ -5,7 +5,7 @@ import {
     DashboardOutlined,
     CreditCardOutlined,
 } from '@ant-design/icons';
-import { useTheme } from '../hooks/useTheme';
+import { useTheme } from '@/hooks/useTheme';
 
 const features = [
     {

@@ -1,12 +1,12 @@
 import React from "react";
 import { Tag } from "antd";
-import { useTheme } from "../hooks/useTheme";
-import Img1 from "../assets/camera.jpg";
-import Img2 from "../assets/barrier.png";
-import Img3 from "../assets/ovs.jpg";
-import Img4 from "../assets/webapp.jpg";
+import { useTheme } from "@/hooks/useTheme";
+import Img1 from "@/assets/camera.jpg";
+import Img2 from "@/assets/barrier.png";
+import Img3 from "@/assets/ovs.jpg";
+import Img4 from "@/assets/webapp.jpg";
 import { FloatButton } from "antd";
-import VideoSP from "../assets/videosp.mp4";
+import VideoSP from "@/assets/videosp.mp4";
 import Atropos from "atropos/react";
 
 const technologies = [

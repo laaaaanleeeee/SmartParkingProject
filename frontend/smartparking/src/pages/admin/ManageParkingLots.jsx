@@ -1,12 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { Table, message, Button, Modal, Form, Input, InputNumber, Popconfirm } from "antd";
+import {
+  Table,
+  message,
+  Button,
+  Modal,
+  Form,
+  Input,
+  InputNumber,
+  Popconfirm,
+} from "antd";
 import {
   adminGetAllParkingLots,
   adminCreateParkingLot,
   adminUpdateParkingLot,
   adminDeleteParkingLot,
-} from "../../services/ParkingLotService";
-import { useTheme } from "../../hooks/useTheme";
+} from "@/services/ParkingLotService";
+import { useTheme } from "@/hooks/useTheme";
 
 const ManageParkingLots = () => {
   const [loading, setLoading] = useState(false);
@@ -24,13 +33,19 @@ const ManageParkingLots = () => {
   const { theme } = useTheme();
 
   const textClass = theme === "dark" ? "text-gray-200" : "text-gray-800";
-  const bgClass = theme === "dark" ? "bg-gray-900" : "bg-white";
-  const tableRowClass = theme === "dark" ? "bg-gray-800 text-green-500" : "bg-white text-gray-800";
+  const bgClass = theme === "dark" ? "bg-black" : "bg-white";
+  const tableRowClass =
+    theme === "dark" ? "bg-gray-800 text-gray-200" : "bg-white text-gray-800";
+  const modalBgClass = theme === "dark" ? "bg-gray-900" : "bg-white";
 
   const fetchParkingLots = async (page = 1, size = 10, filters = {}) => {
     try {
       setLoading(true);
-      const res = await adminGetAllParkingLots({ page: page - 1, size, ...filters });
+      const res = await adminGetAllParkingLots({
+        page: page - 1,
+        size,
+        ...filters,
+      });
       setParkingLots(res.data.listDTO);
       setPagination({
         current: res.data.page + 1,
@@ -103,9 +118,16 @@ const ManageParkingLots = () => {
       key: "action",
       render: (_, record) => (
         <div className="flex gap-2">
-          <Button type="link" onClick={() => handleEdit(record)}>Edit</Button>
-          <Popconfirm title="Are you sure delete this?" onConfirm={() => handleDelete(record.id)}>
-            <Button type="link" danger>Delete</Button>
+          <Button type="link" onClick={() => handleEdit(record)}>
+            Edit
+          </Button>
+          <Popconfirm
+            title="Are you sure delete this?"
+            onConfirm={() => handleDelete(record.id)}
+          >
+            <Button type="link" danger>
+              Delete
+            </Button>
           </Popconfirm>
         </div>
       ),
@@ -113,10 +135,12 @@ const ManageParkingLots = () => {
   ];
 
   return (
-    <div className="p-6 rounded-lg shadow">
+    <div className={`p-6 rounded-lg shadow ${bgClass} ${textClass} min-h-screen`}>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Manage Parking Lots</h1>
-        <Button type="primary" onClick={handleAdd}>Add Parking Lot</Button>
+        <Button type="primary" onClick={handleAdd}>
+          Add Parking Lot
+        </Button>
       </div>
 
       <div className="mb-6">
@@ -124,25 +148,29 @@ const ManageParkingLots = () => {
           form={searchForm}
           layout="inline"
           className="flex flex-wrap gap-4"
-          onFinish={(values) => fetchParkingLots(1, pagination.pageSize, values)}
+          onFinish={(values) =>
+            fetchParkingLots(1, pagination.pageSize, values)
+          }
         >
-          <Form.Item name="name" label="Name">
+          <Form.Item name="name" label={<span className={theme === "dark" ? "text-gray-200" : "text-gray-800"}>Name</span>}>
             <Input placeholder="Search name" allowClear />
           </Form.Item>
-          <Form.Item name="city" label="City">
+          <Form.Item name="city" label={<span className={theme === "dark" ? "text-gray-200" : "text-gray-800"}>City</span>}>
             <Input placeholder="Search city" allowClear />
           </Form.Item>
-          <Form.Item name="ward" label="Ward">
+          <Form.Item name="ward" label={<span className={theme === "dark" ? "text-gray-200" : "text-gray-800"}>Ward</span>}>
             <Input placeholder="Search ward" allowClear />
           </Form.Item>
-          <Form.Item name="minPrice" label="Min Price">
+          <Form.Item name="minPrice" label={<span className={theme === "dark" ? "text-gray-200" : "text-gray-800"}>Min Price</span>}>
             <InputNumber style={{ width: 120 }} />
           </Form.Item>
-          <Form.Item name="maxPrice" label="Max Price">
+          <Form.Item name="maxPrice" label={<span className={theme === "dark" ? "text-gray-200" : "text-gray-800"}>Max Price</span>}>
             <InputNumber style={{ width: 120 }} />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit">Search</Button>
+            <Button type="primary" htmlType="submit">
+              Search
+            </Button>
           </Form.Item>
         </Form>
       </div>
@@ -169,8 +197,9 @@ const ManageParkingLots = () => {
         onOk={handleOk}
         onCancel={() => setIsModalOpen(false)}
         okText="Save"
+        className={modalBgClass}
       >
-        <Form form={form} layout="vertical">
+        <Form form={form} layout="vertical" className={textClass}>
           <Form.Item name="name" label="Name" rules={[{ required: true }]}>
             <Input />
           </Form.Item>

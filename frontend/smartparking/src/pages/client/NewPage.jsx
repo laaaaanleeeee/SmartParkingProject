@@ -2,14 +2,14 @@ import React, { useEffect, useState } from "react";
 import { message, Tabs, FloatButton } from "antd";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
-import { useTheme } from "../hooks/useTheme";
+import { useTheme } from "@/hooks/useTheme";
 import {
   getAllNews,
   getNewsByCategory,
-} from "../services/NewsService";
-import Img1 from "../assets/parkinglotimg.jpg";
+} from "@/services/NewsService";
+import Img1 from "@/assets/parkinglotimg.jpg";
 import { useNavigate } from "react-router-dom";
-import { createSlug } from "../utils/Slugify";
+import { createSlug } from "@/utils/Slugify";
 
 const NewsPage = () => {
   const { theme } = useTheme();

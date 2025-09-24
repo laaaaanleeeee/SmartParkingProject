@@ -1,4 +1,4 @@
-import api from "../api/axiosInstance";
+import api from "@/api/axiosInstance";
 
 export const createPayment = (data) => {
   return api.post("/payments/create", data);

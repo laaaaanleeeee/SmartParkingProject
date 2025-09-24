@@ -1,9 +1,9 @@
 import { useNavigate, NavLink } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "@/hooks/useAuth";
 import { notification } from "antd";
-import ImgBg from "../assets/parkinglotimg2.jpg";
+import ImgBg from "@/assets/parkinglotimg2.jpg";
 
 const SignupPage = () => {
   const navigate = useNavigate();

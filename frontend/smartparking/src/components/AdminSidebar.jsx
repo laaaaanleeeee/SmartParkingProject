@@ -8,8 +8,11 @@ import {
   CreditCard,
   BarChart2,
   LogOut,
+  Sun,
+  Moon
 } from "lucide-react";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "@/hooks/useAuth";
+import { useTheme } from "@/hooks/useTheme";
 
 const menuItems = [
   { to: "/admin/manage_parking_lots", label: "Parking Lots", icon: <LayoutDashboard size={20} /> },
@@ -22,6 +25,11 @@ const menuItems = [
 
 const AdminSidebar = () => {
   const { logout } = useAuth();
+  const { theme, setTheme } = useTheme();
+
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
+  };
 
   return (
     <div className="h-screen w-64 bg-gray-900 text-white flex flex-col p-4">
@@ -32,8 +40,7 @@ const AdminSidebar = () => {
             key={item.to}
             to={item.to}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-                isActive ? "bg-gray-700 text-white" : "text-gray-300 hover:bg-gray-800"
+              `flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${isActive ? "bg-gray-700 text-white" : "text-gray-300 hover:bg-gray-800"
               }`
             }
           >
@@ -42,6 +49,14 @@ const AdminSidebar = () => {
           </NavLink>
         ))}
       </nav>
+
+      <button
+        onClick={toggleTheme}
+        className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors mb-2"
+      >
+        {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
+        <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+      </button>
 
       <button
         onClick={logout}

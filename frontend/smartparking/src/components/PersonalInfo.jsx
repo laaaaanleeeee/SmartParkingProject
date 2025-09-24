@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "@/hooks/useAuth";
 import { useOutletContext } from "react-router-dom";
 
 const PersonalInfo = () => {

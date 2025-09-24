@@ -1,8 +1,8 @@
 import React from "react";
 import { Outlet, NavLink } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "@/hooks/useAuth";
 import { User, ShoppingCart, LogOut, Car, CreditCard } from "lucide-react";
-import { useTheme } from "../hooks/useTheme";
+import { useTheme } from "@/hooks/useTheme";
 
 const UserInfoPage = () => {
   const { user, logout } = useAuth();

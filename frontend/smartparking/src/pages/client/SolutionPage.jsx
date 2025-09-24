@@ -1,12 +1,12 @@
 import React from "react";
 import { FloatButton } from "antd";
-import { useTheme } from "../hooks/useTheme";
+import { useTheme } from "@/hooks/useTheme";
 import {
   CheckCircleOutlined,
   BulbOutlined,
   StarOutlined,
 } from "@ant-design/icons";
-import ImgBg1 from "../assets/parkinglotimg.jpg";
+import ImgBg1 from "@/assets/parkinglotimg.jpg";
 
 const solutions = [
   {

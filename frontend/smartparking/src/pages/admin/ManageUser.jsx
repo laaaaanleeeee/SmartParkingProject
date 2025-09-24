@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Table, message, Button, Modal, Form, Input, Select, Popconfirm } from "antd";
-import { getAllUsers, createUser, deleteUser, updateUser } from "../../services/UserService";
-import { useTheme } from "../../hooks/useTheme";
+import { getAllUsers, createUser, deleteUser, updateUser } from "@/services/UserService";
+import { useTheme } from "@/hooks/useTheme";
 
 const { Option } = Select;
 
@@ -21,8 +21,9 @@ const ManageUser = () => {
   const { theme } = useTheme();
 
   const textClass = theme === "dark" ? "text-gray-200" : "text-gray-800";
-  const bgClass = theme === "dark" ? "bg-gray-900" : "bg-white";
-  const tableRowClass = theme === "dark" ? "bg-gray-800 text-green-500" : "bg-white text-gray-800";
+  const bgClass = theme === "dark" ? "bg-black" : "bg-white";
+  const tableRowClass = theme === "dark" ? "bg-gray-800 text-gray-200" : "bg-white text-gray-800";
+  const modalBgClass = theme === "dark" ? "bg-gray-900" : "bg-white";
 
   const fetchUsers = async (page = 1, size = 10, filters = {}) => {
     try {
@@ -110,7 +111,7 @@ const ManageUser = () => {
   ];
 
   return (
-    <div className="p-6 rounded-lg shadow">
+    <div className={`p-6 rounded-lg shadow ${bgClass} ${textClass} min-h-screen`}>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Manage Users</h1>
         <Button type="primary" onClick={handleAdd}>Add User</Button>
@@ -123,13 +124,13 @@ const ManageUser = () => {
           className="flex flex-wrap gap-4"
           onFinish={(values) => fetchUsers(1, pagination.pageSize, values)}
         >
-          <Form.Item name="username" label="Username">
+          <Form.Item name="username" label={<span className={theme === "dark" ? "text-gray-200" : "text-gray-800"}>Username</span>}>
             <Input placeholder="Search username" allowClear />
           </Form.Item>
-          <Form.Item name="email" label="Email">
+          <Form.Item name="email" label={<span className={theme === "dark" ? "text-gray-200" : "text-gray-800"}>Email</span>}>
             <Input placeholder="Search email" allowClear />
           </Form.Item>
-          <Form.Item name="fullName" label="Full Name">
+          <Form.Item name="fullName" label={<span className={theme === "dark" ? "text-gray-200" : "text-gray-800"}>Full Name</span>}>
             <Input placeholder="Search full name" allowClear />
           </Form.Item>
           <Form.Item>
@@ -160,21 +161,22 @@ const ManageUser = () => {
         onOk={handleOk}
         onCancel={() => setIsModalOpen(false)}
         okText="Save"
+        className={modalBgClass}
       >
-        <Form form={form} layout="vertical">
-          <Form.Item name="username" label="Username" rules={[{ required: true }]}>
+        <Form form={form} layout="vertical" className={textClass}>
+          <Form.Item name="username" label={<span className={theme === "dark" ? "text-gray-200" : "text-gray-800"}>Username</span>} rules={[{ required: true }]}>
             <Input />
           </Form.Item>
-          <Form.Item name="fullName" label="Full Name" rules={[{ required: true }]}>
+          <Form.Item name="fullName" label={<span className={theme === "dark" ? "text-gray-200" : "text-gray-800"}>Full Name</span>} rules={[{ required: true }]}>
             <Input />
           </Form.Item>
-          <Form.Item name="email" label="Email" rules={[{ required: true, type: "email" }]}>
+          <Form.Item name="email" label={<span className={theme === "dark" ? "text-gray-200" : "text-gray-800"}>Email</span>} rules={[{ required: true, type: "email" }]}>
             <Input />
           </Form.Item>
-          <Form.Item name="phone" label="Phone">
+          <Form.Item name="phone" label={<span className={theme === "dark" ? "text-gray-200" : "text-gray-800"}>Phone</span>}>
             <Input />
           </Form.Item>
-          <Form.Item name="userRole" label="Role" rules={[{ required: true }]}>
+          <Form.Item name="userRole" label={<span className={theme === "dark" ? "text-gray-200" : "text-gray-800"}>Role</span>} rules={[{ required: true }]}>
             <Select>
               <Option value="ADMIN">ADMIN</Option>
               <Option value="CLIENT">CLIENT</Option>

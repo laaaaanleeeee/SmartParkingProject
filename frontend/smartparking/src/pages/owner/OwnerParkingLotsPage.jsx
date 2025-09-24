@@ -4,9 +4,19 @@ import {
   createMyParkingLot,
   updateMyParkingLot,
   deleteMyParkingLot,
-} from "../../services/ParkingLotService";
+} from "@/services/ParkingLotService";
+import { Plus, MapPin, Car, DollarSign } from "lucide-react";
+import { useTheme } from "@/hooks/useTheme";
 
 const OwnerParkingLotsPage = () => {
+  const { theme } = useTheme();
+
+  const textPrimary = theme === "dark" ? "text-gray-100" : "text-gray-900";
+  const textSecondary = theme === "dark" ? "text-gray-400" : "text-gray-600";
+  const bgMain = theme === "dark" ? "bg-gray-950" : "bg-gray-100";
+  const bgCard = theme === "dark" ? "bg-gray-900" : "bg-white";
+  const borderCard = theme === "dark" ? "border-gray-800" : "border-gray-200";
+
   const [lots, setLots] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
@@ -60,7 +70,10 @@ const OwnerParkingLotsPage = () => {
       city: lot.city,
       ward: lot.ward,
       totalSlots: lot.totalSlots,
-      pricePerHour: lot.pricePerHour,
+      pricePerHour:
+        lot.pricings && lot.pricings.length > 0
+          ? lot.pricings[0].pricePerHour
+          : 0,
     });
     setIsModalOpen(true);
   };
@@ -87,52 +100,131 @@ const OwnerParkingLotsPage = () => {
     }
   };
 
+  const totalSlots = lots.reduce((sum, lot) => sum + lot.totalSlots, 0);
+  const availableSlots = lots.reduce(
+    (sum, lot) => sum + (lot.availableSlots || 0),
+    0
+  );
+
+  const avgPrice =
+    lots.length > 0
+      ? Math.round(
+          lots.reduce((sum, l) => {
+            if (!l.pricings || l.pricings.length === 0) return sum;
+            const avgLot =
+              l.pricings.reduce((s, p) => s + p.pricePerHour, 0) /
+              l.pricings.length;
+            return sum + avgLot;
+          }, 0) / lots.length
+        )
+      : 0;
+
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Bãi đỗ của tôi</h1>
+    <div className={`p-6 space-y-8 min-h-screen ${bgMain} transition-colors`}>
+      <div className="flex justify-between items-center">
+        <h1 className={`text-2xl font-bold ${textPrimary}`}>Quản lý bãi đỗ</h1>
         <button
           onClick={openCreateModal}
-          className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
         >
-          + Thêm bãi đỗ
+          <Plus size={18} /> Thêm bãi đỗ
         </button>
       </div>
 
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div
+          className={`p-4 rounded-xl border shadow flex items-center gap-3 ${bgCard} ${borderCard}`}
+        >
+          <MapPin className="text-blue-500" size={28} />
+          <div>
+            <p className={`${textSecondary} text-sm`}>Tổng số bãi</p>
+            <p className={`text-xl font-semibold ${textPrimary}`}>
+              {lots.length}
+            </p>
+          </div>
+        </div>
+        <div
+          className={`p-4 rounded-xl border shadow flex items-center gap-3 ${bgCard} ${borderCard}`}
+        >
+          <Car className="text-green-500" size={28} />
+          <div>
+            <p className={`${textSecondary} text-sm`}>Số chỗ trống</p>
+            <p className={`text-xl font-semibold ${textPrimary}`}>
+              {availableSlots}/{totalSlots}
+            </p>
+          </div>
+        </div>
+        <div
+          className={`p-4 rounded-xl border shadow flex items-center gap-3 ${bgCard} ${borderCard}`}
+        >
+          <DollarSign className="text-yellow-500" size={28} />
+          <div>
+            <p className={`${textSecondary} text-sm`}>Giá TB / giờ</p>
+            <p className={`text-xl font-semibold ${textPrimary}`}>
+              {avgPrice} VND
+            </p>
+          </div>
+        </div>
+      </div>
+
       {loading ? (
-        <p>Đang tải...</p>
+        <p className={textSecondary}>Đang tải...</p>
       ) : lots.length === 0 ? (
-        <p>Chưa có bãi đỗ nào.</p>
+        <p className={textSecondary}>Chưa có bãi đỗ nào.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {lots.map((lot) => (
             <div
               key={lot.id}
-              className="bg-white rounded-2xl shadow-md p-4 border border-gray-200"
+              className={`rounded-xl shadow p-5 border flex flex-col justify-between ${bgCard} ${borderCard}`}
             >
-              <h2 className="text-xl font-semibold">{lot.name}</h2>
-              <p className="text-gray-600">{lot.address}</p>
-              <p className="text-gray-500 text-sm">
-                {lot.city} - {lot.ward}
-              </p>
-              <p className="mt-2 text-sm">
-                <span className="font-medium">Slots:</span>{" "}
-                {lot.availableSlots}/{lot.totalSlots}
-              </p>
-              <p className="mt-1 text-sm">
-                <span className="font-medium">Giá/giờ:</span>{" "}
-                {lot.pricePerHour} VND
-              </p>
+              <div>
+                <h2 className={`text-lg font-semibold ${textPrimary}`}>
+                  {lot.name}
+                </h2>
+                <p className={`${textSecondary} text-sm`}>{lot.address}</p>
+                <p className={`${textSecondary} text-sm`}>
+                  {lot.city} - {lot.ward}
+                </p>
+                <div className="mt-3 text-sm space-y-1">
+                  <p>
+                    <span className="font-medium">Slots:</span>{" "}
+                    {lot.availableSlots}/{lot.totalSlots}
+                  </p>
+
+                  <div>
+                    <span className="font-medium">Giá/giờ:</span>
+                    <div className="ml-2 mt-1 space-y-0.5">
+                      {lot.pricings && lot.pricings.length > 0 ? (
+                        lot.pricings.map((p) => (
+                          <p
+                            key={p.id}
+                            className={`${textSecondary} flex justify-between`}
+                          >
+                            <span>{p.vehicleType}</span>
+                            <span className={textPrimary}>
+                              {p.pricePerHour} VND
+                            </span>
+                          </p>
+                        ))
+                      ) : (
+                        <span className={textSecondary}>Chưa có giá</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div className="mt-4 flex gap-2">
                 <button
                   onClick={() => openEditModal(lot)}
-                  className="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                  className="flex-1 px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
                 >
                   Sửa
                 </button>
                 <button
                   onClick={() => handleDelete(lot.id)}
-                  className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                  className="flex-1 px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600"
                 >
                   Xóa
                 </button>
@@ -142,69 +234,54 @@ const OwnerParkingLotsPage = () => {
         </div>
       )}
 
-      <div className="mt-6 flex justify-center gap-2">
-        {[...Array(totalPage)].map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setPage(i)}
-            className={`px-3 py-1 rounded-lg ${
-              i === page
-                ? "bg-blue-500 text-white"
-                : "bg-gray-200 hover:bg-gray-300"
-            }`}
-          >
-            {i + 1}
-          </button>
-        ))}
-      </div>
+      {totalPage > 1 && (
+        <div className="mt-6 flex justify-center gap-2">
+          {[...Array(totalPage)].map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setPage(i)}
+              className={`px-3 py-1 rounded-lg ${
+                i === page
+                  ? "bg-blue-500 text-white"
+                  : `${bgCard} ${borderCard} ${textSecondary} hover:opacity-80`
+              }`}
+            >
+              {i + 1}
+            </button>
+          ))}
+        </div>
+      )}
 
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
-          <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-md">
-            <h2 className="text-xl font-semibold mb-4">
+          <div
+            className={`rounded-xl shadow-lg p-6 w-full max-w-md ${bgCard} ${borderCard}`}
+          >
+            <h2 className={`text-xl font-semibold mb-4 ${textPrimary}`}>
               {editingLot ? "Cập nhật bãi đỗ" : "Thêm bãi đỗ mới"}
             </h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <input
-                type="text"
-                placeholder="Tên bãi đỗ"
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-                className="w-full border rounded-lg p-2"
-                required
-              />
-              <input
-                type="text"
-                placeholder="Địa chỉ"
-                value={formData.address}
-                onChange={(e) =>
-                  setFormData({ ...formData, address: e.target.value })
-                }
-                className="w-full border rounded-lg p-2"
-                required
-              />
-              <input
-                type="text"
-                placeholder="Thành phố"
-                value={formData.city}
-                onChange={(e) =>
-                  setFormData({ ...formData, city: e.target.value })
-                }
-                className="w-full border rounded-lg p-2"
-                required
-              />
-              <input
-                type="text"
-                placeholder="Phường/Xã"
-                value={formData.ward}
-                onChange={(e) =>
-                  setFormData({ ...formData, ward: e.target.value })
-                }
-                className="w-full border rounded-lg p-2"
-                required
-              />
+            <form onSubmit={handleSubmit} className="space-y-3">
+              {["name", "address", "city", "ward"].map((field) => (
+                <input
+                  key={field}
+                  type="text"
+                  placeholder={
+                    field === "name"
+                      ? "Tên bãi đỗ"
+                      : field === "address"
+                      ? "Địa chỉ"
+                      : field === "city"
+                      ? "Thành phố"
+                      : "Phường/Xã"
+                  }
+                  value={formData[field]}
+                  onChange={(e) =>
+                    setFormData({ ...formData, [field]: e.target.value })
+                  }
+                  className={`w-full border rounded-lg p-2 ${bgMain} ${textPrimary} ${borderCard}`}
+                  required
+                />
+              ))}
               <input
                 type="number"
                 placeholder="Tổng số chỗ"
@@ -212,30 +289,30 @@ const OwnerParkingLotsPage = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, totalSlots: e.target.value })
                 }
-                className="w-full border rounded-lg p-2"
+                className={`w-full border rounded-lg p-2 ${bgMain} ${textPrimary} ${borderCard}`}
                 required
               />
               <input
                 type="number"
-                placeholder="Giá/giờ (VND)"
+                placeholder="Giá/giờ mặc định (VND)"
                 value={formData.pricePerHour}
                 onChange={(e) =>
                   setFormData({ ...formData, pricePerHour: e.target.value })
                 }
-                className="w-full border rounded-lg p-2"
-                required
+                className={`w-full border rounded-lg p-2 ${bgMain} ${textPrimary} ${borderCard}`}
               />
+
               <div className="flex justify-end gap-2 mt-4">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300"
+                  className={`px-4 py-2 rounded-lg ${bgMain} ${textSecondary} ${borderCard} hover:opacity-80`}
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600"
+                  className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
                 >
                   {editingLot ? "Cập nhật" : "Tạo mới"}
                 </button>

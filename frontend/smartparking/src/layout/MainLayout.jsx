@@ -1,7 +1,7 @@
-import Header from '../components/Header';
+import Header from '@/components/Header';
 import { Outlet } from "react-router-dom";
-import Footer from '../components/Footer';
-import WrapperTheme from "../components/WrapperTheme";
+import Footer from '@/components/Footer';
+import WrapperTheme from "@/components/WrapperTheme";
 
 
 const MainLayout = () => {  

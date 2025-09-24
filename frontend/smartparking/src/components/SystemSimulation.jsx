@@ -1,9 +1,9 @@
 import React from 'react';
-import Img1 from '../assets/camera.jpg';
-import Img2 from '../assets/barrier.png';
-import Img3 from '../assets/ovs.jpg';
-import Img4 from '../assets/webapp.jpg';
-import { useTheme } from '../hooks/useTheme';
+import Img1 from '@/assets/camera.jpg';
+import Img2 from '@/assets/barrier.png';
+import Img3 from '@/assets/ovs.jpg';
+import Img4 from '@/assets/webapp.jpg';
+import { useTheme } from '@/hooks/useTheme';
 import { NavLink } from 'react-router-dom';
 import { Button } from 'antd';
 import Atropos from "atropos/react";

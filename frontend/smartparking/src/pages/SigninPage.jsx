@@ -1,9 +1,9 @@
 import { useNavigate, NavLink } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "@/hooks/useAuth";
 import { notification } from "antd";
-import ImgBg from "../assets/parkinglotimg2.jpg";
+import ImgBg from "@/assets/parkinglotimg2.jpg";
 
 const SigninPage = () => {
   const navigate = useNavigate();
@@ -28,7 +28,15 @@ const SigninPage = () => {
     onSubmit: async (values) => {
       await login(values.username, values.password);
       openNotification();
-      navigate("/");
+      const role = localStorage.getItem("userRole");
+
+      if (role === "ADMIN") {
+        navigate("/admin");
+      } else if (role === "OWNER") {
+        navigate("/owner");
+      } else {
+        navigate("/");
+      }
     },
   });
 
@@ -82,7 +90,7 @@ const SigninPage = () => {
 
             <button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition cursor-pointer"
             >
               Đăng nhập
             </button>

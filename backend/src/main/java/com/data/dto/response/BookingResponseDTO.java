@@ -29,6 +29,8 @@ public class BookingResponseDTO {
     String cancellationReason;
     String address;
 
+    String licensePlate;
+
     public BookingResponseDTO(Booking booking) {
         this.id = booking.getId();
         this.startTime = booking.getStartTime() != null ? booking.getStartTime().toString() : null;
@@ -49,5 +51,6 @@ public class BookingResponseDTO {
         this.slotName = booking.getParkingSlot() != null? booking.getParkingSlot().getSlotNumber() : null;
         this.userName = booking.getUser() != null? booking.getUser().getFullName() : null;
         this.address = booking.getParkingLot() != null? booking.getParkingLot().getAddress() : null;
+        this.licensePlate = booking.getVehicle() != null ? booking.getVehicle().getLicensePlate() : null;
     }
 }

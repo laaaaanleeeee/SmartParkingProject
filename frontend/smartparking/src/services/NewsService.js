@@ -1,4 +1,4 @@
-import api from "../api/axiosInstance";
+import api from "@/api/axiosInstance";
 
 export const getAllNews = (filters = {}) => {
   const { page = 0, size = 10, title = "", poster = "" } = filters;

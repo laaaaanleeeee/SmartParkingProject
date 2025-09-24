@@ -1,36 +1,26 @@
 import React, { useEffect, useState } from "react";
-import { Table, message, Button, Modal, Form, Input, Popconfirm } from "antd";
-import { getAllNews, createNews, updateNews, deleteNews } from "../../services/NewsService";
-import { useTheme } from "../../hooks/useTheme";
+import { message } from "antd";
+import { getAllNews, createNews, updateNews, deleteNews } from "@/services/NewsService";
+import { useTheme } from "@/hooks/useTheme";
 
 const ManageNews = () => {
   const [loading, setLoading] = useState(false);
   const [newsList, setNewsList] = useState([]);
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pageSize: 10,
-    total: 0,
-  });
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingNews, setEditingNews] = useState(null);
-  const [form] = Form.useForm();
+  const [showModal, setShowModal] = useState(false);
   const { theme } = useTheme();
 
+  const bgClass = theme === "dark" ? "bg-black" : "bg-white";
   const textClass = theme === "dark" ? "text-gray-200" : "text-gray-800";
-  const bgClass = theme === "dark" ? "bg-gray-900" : "bg-white";
-  const tableRowClass = theme === "dark" ? "bg-gray-800 text-green-500" : "bg-white text-gray-800";
+  const inputClass = `w-full px-3 py-2 rounded-lg border ${
+    theme === "dark" ? "bg-gray-800 border-gray-700 text-gray-200" : "bg-white border-gray-300 text-gray-800"
+  } focus:outline-none focus:ring focus:ring-blue-400`;
 
-  const fetchNews = async (page = 1, size = 10, filters = {}) => {
+  const fetchNews = async () => {
     try {
       setLoading(true);
-      const res = await getAllNews({ page: page - 1, size, ...filters });
+      const res = await getAllNews({ page: 0, size: 20 });
       setNewsList(res.data.listDTO);
-      setPagination({
-        current: res.data.page + 1,
-        pageSize: res.data.size,
-        total: res.data.totalElement,
-      });
     } catch (error) {
       console.error(error);
       message.error("Failed to load news");
@@ -40,35 +30,25 @@ const ManageNews = () => {
   };
 
   useEffect(() => {
-    fetchNews(pagination.current, pagination.pageSize);
+    fetchNews();
   }, []);
-
-  const handleAdd = () => {
-    setEditingNews(null);
-    form.resetFields();
-    setIsModalOpen(true);
-  };
-
-  const handleEdit = (record) => {
-    setEditingNews(record);
-    form.setFieldsValue(record);
-    setIsModalOpen(true);
-  };
 
   const handleDelete = async (id) => {
     try {
       await deleteNews(id);
       message.success("Deleted successfully");
-      fetchNews(pagination.current, pagination.pageSize);
-    } catch (error) {
-      console.error(error);
+      fetchNews();
+    } catch {
       message.error("Failed to delete");
     }
   };
 
-  const handleOk = async () => {
+  const handleSave = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const values = Object.fromEntries(formData.entries());
+
     try {
-      const values = await form.validateFields();
       if (editingNews) {
         await updateNews(editingNews.id, values);
         message.success("Updated successfully");
@@ -76,95 +56,121 @@ const ManageNews = () => {
         await createNews(values);
         message.success("Created successfully");
       }
-      setIsModalOpen(false);
-      fetchNews(pagination.current, pagination.pageSize);
-    } catch (error) {
-      console.error(error);
+      setShowModal(false);
+      fetchNews();
+    } catch {
       message.error("Failed to save");
     }
   };
 
-  const columns = [
-    { title: "ID", dataIndex: "id", key: "id" },
-    { title: "Title", dataIndex: "title", key: "title" },
-    { title: "Content", dataIndex: "content", key: "content" },
-    { title: "Posted At", dataIndex: "postedAt", key: "postedAt" },
-    {
-      title: "Posted By",
-      dataIndex: "postedBy",
-      key: "postedBy",
-      render: (postedBy) => postedBy?.username,
-    },
-    {
-      title: "Action",
-      key: "action",
-      render: (_, record) => (
-        <div className="flex gap-2">
-          <Button type="link" onClick={() => handleEdit(record)}>Edit</Button>
-          <Popconfirm title="Are you sure delete this?" onConfirm={() => handleDelete(record.id)}>
-            <Button type="link" danger>Delete</Button>
-          </Popconfirm>
-        </div>
-      ),
-    },
-  ];
-
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-xl font-bold">Manage News</h1>
-        <Button type="primary" onClick={handleAdd}>Add News</Button>
+    <div className={`p-6 rounded-lg shadow ${bgClass} ${textClass} min-h-screen`}>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Manage News</h1>
+        <button
+          onClick={() => {
+            setEditingNews(null);
+            setShowModal(true);
+          }}
+          className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600"
+        >
+          Add News
+        </button>
       </div>
 
-      <div className="mb-6">
-        <Form layout="inline" onFinish={(values) => fetchNews(1, pagination.pageSize, values)} className="mb-4">
-          <Form.Item name="title" label="Title">
-            <Input placeholder="Search title" />
-          </Form.Item>
-          <Form.Item name="poster" label="Posted By">
-            <Input placeholder="Search poster username" />
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit">Search</Button>
-          </Form.Item>
-        </Form>
+      <div className="overflow-x-auto">
+        <table className="min-w-full border border-gray-700 rounded-lg">
+          <thead className={theme === "dark" ? "bg-gray-800" : "bg-gray-200"}>
+            <tr>
+              <th className="px-4 py-2 text-left">ID</th>
+              <th className="px-4 py-2 text-left">Title</th>
+              <th className="px-4 py-2 text-left">Content</th>
+              <th className="px-4 py-2 text-left">Posted By</th>
+              <th className="px-4 py-2 text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {newsList.map((news) => (
+              <tr
+                key={news.id}
+                className={theme === "dark" ? "border-b border-gray-700 hover:bg-gray-800" : "border-b hover:bg-gray-100"}
+              >
+                <td className="px-4 py-2">{news.id}</td>
+                <td className="px-4 py-2">{news.title}</td>
+                <td className="px-4 py-2">{news.content}</td>
+                <td className="px-4 py-2">{news.postedBy?.username}</td>
+                <td className="px-4 py-2 text-center space-x-2">
+                  <button
+                    onClick={() => {
+                      setEditingNews(news);
+                      setShowModal(true);
+                    }}
+                    className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(news.id)}
+                    className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+            {newsList.length === 0 && (
+              <tr>
+                <td colSpan="5" className="px-4 py-6 text-center italic">
+                  No news found
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
 
-      <Table
-        loading={loading}
-        columns={columns}
-        dataSource={newsList}
-        rowKey="id"
-        pagination={{
-          current: pagination.current,
-          pageSize: pagination.pageSize,
-          total: pagination.total,
-          onChange: (page, pageSize) => fetchNews(page, pageSize),
-        }}
-        className={`${bgClass} ${textClass}`}
-        rowClassName={() => tableRowClass}
-        bordered
-      />
-
-      <Modal
-        title={editingNews ? "Edit News" : "Add News"}
-        open={isModalOpen}
-        onOk={handleOk}
-        onCancel={() => setIsModalOpen(false)}
-        okText="Save"
-      >
-        <Form form={form} layout="vertical">
-          <Form.Item name="title" label="Title" rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="content" label="Content" rules={[{ required: true }]}>
-            <Input.TextArea rows={4} />
-          </Form.Item>
-          <Form.Item name="postedById" label="Poster ID" rules={[{ required: true }]}>
-            <Input type="number" />
-          </Form.Item>
-        </Form>
-      </Modal>
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <form
+            onSubmit={handleSave}
+            className={`p-6 rounded-lg shadow-lg w-96 ${bgClass}`}
+          >
+            <h2 className="text-xl font-bold mb-4">{editingNews ? "Edit News" : "Add News"}</h2>
+            <input
+              name="title"
+              placeholder="Title"
+              defaultValue={editingNews?.title}
+              className={`${inputClass} mb-3`}
+            />
+            <textarea
+              name="content"
+              placeholder="Content"
+              defaultValue={editingNews?.content}
+              className={`${inputClass} mb-3`}
+              rows="4"
+            />
+            <input
+              name="postedById"
+              placeholder="Poster ID"
+              type="number"
+              defaultValue={editingNews?.postedById}
+              className={`${inputClass} mb-3`}
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setShowModal(false)}
+                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+              <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                Save
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   );
 };

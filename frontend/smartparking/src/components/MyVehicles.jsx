@@ -4,10 +4,10 @@ import {
   deleteVehicle,
   createVehicle,
   updateVehicle,
-} from "../services/VehicleService";
+} from "@/services/VehicleService";
 import { message, Button, Drawer, Form, Input, Select, Card } from "antd";
 import { CarOutlined } from "@ant-design/icons";
-import { useTheme } from "../hooks/useTheme";
+import { useTheme } from "@/hooks/useTheme";
 
 const { Option } = Select;
 

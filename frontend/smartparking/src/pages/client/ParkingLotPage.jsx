@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Input, Select, Slider, Rate, message, Pagination } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { useTheme } from '../hooks/useTheme';
-import { getAllParkingLot } from '../services/ParkingLotService';
-import ImgBg1 from '../assets/errorImg.jpg';
+import { useTheme } from '@/hooks/useTheme';
+import { getAllParkingLot } from '@/services/ParkingLotService';
+import ImgBg1 from '@/assets/errorImg.jpg';
 import axios from 'axios';
 import { FloatButton } from 'antd';
-import { createSlug } from "../utils/Slugify";
+import { createSlug } from "@/utils/Slugify";
 
 const { Option } = Select;
 

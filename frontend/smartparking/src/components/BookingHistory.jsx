@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getMyBookings, cancelBooking, completeBooking } from "../services/BookingService";
 import { message, Button, Tag, Spin, Pagination, Card } from "antd";
-import { useTheme } from "../hooks/useTheme";
+import { useTheme } from "@/hooks/useTheme";
 import {
   CalendarOutlined,
   EnvironmentOutlined,

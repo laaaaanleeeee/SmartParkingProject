@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getParkingLotDetail } from "../services/ParkingLotService";
-import { useTheme } from "../hooks/useTheme";
+import { getParkingLotDetail } from "@/services/ParkingLotService";
+import { useTheme } from "@/hooks/useTheme";
 import { Carousel } from "antd";
 import {
   MapPin,
@@ -11,7 +11,7 @@ import {
   Car,
 } from "lucide-react";
 import { FloatButton } from 'antd';
-import { createSlug } from "../utils/Slugify";
+import { createSlug } from "@/utils/Slugify";
 
 const ParkingLotDetailPage = () => {
   const { id } = useParams();

@@ -1,12 +1,12 @@
 import React from "react";
 import { FloatButton, Carousel } from "antd";
-import { useTheme } from "../hooks/useTheme";
-import CEOImg from "../assets/errorImg.jpg";
-import CTOImg from "../assets/errorImg.jpg";
-import DoXe from "../assets/doxe.jpg";
-import VietNam from "../assets/covietnam.jfif";
-import TechImg from "../assets/phattrien.jpg";
-import LogoImg from "../assets/S.png";
+import { useTheme } from "@/hooks/useTheme";
+import CEOImg from "@/assets/errorImg.jpg";
+import CTOImg from "@/assets/errorImg.jpg";
+import DoXe from "@/assets/doxe.jpg";
+import VietNam from "@/assets/covietnam.jfif";
+import TechImg from "@/assets/phattrien.jpg";
+import LogoImg from "@/assets/S.png";
 
 const ContactPage = () => {
   const { theme } = useTheme();

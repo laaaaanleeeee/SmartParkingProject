@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'react-scroll';
-import ImgBg1 from '../assets/parkinglotimg.jpg';
-import ImgBg2 from '../assets/parkinglotimg2.jpg';
-import ImgBg3 from '../assets/parkinglotimg3.jpg';
+import ImgBg1 from '@/assets/parkinglotimg.jpg';
+import ImgBg2 from '@/assets/parkinglotimg2.jpg';
+import ImgBg3 from '@/assets/parkinglotimg3.jpg';
 import { Carousel } from 'antd';
 
 const HeroSection = () => {

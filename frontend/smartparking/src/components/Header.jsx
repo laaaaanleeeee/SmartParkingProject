@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { useTheme } from "../hooks/useTheme";
+import { useTheme } from "@/hooks/useTheme";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Switch, Dropdown, message, Drawer, Button } from 'antd';
 import { MoonOutlined, SunOutlined, SearchOutlined, MenuOutlined } from '@ant-design/icons';
-import Logo from '../assets/S.png';
-import { useAuth } from "../hooks/useAuth";
-import { getAllParkingLot } from "../services/ParkingLotService"; 
-import ImgBg1 from "../assets/errorImg.jpg";
-import { createSlug } from "../utils/Slugify";
+import Logo from '@/assets/S.png';
+import { useAuth } from "@/hooks/useAuth";
+import { getAllParkingLot } from "@/services/ParkingLotService"; 
+import ImgBg1 from "@/assets/errorImg.jpg";
+import { createSlug } from "@/utils/Slugify";
 
 const Header = () => {
     const { theme, setTheme } = useTheme();

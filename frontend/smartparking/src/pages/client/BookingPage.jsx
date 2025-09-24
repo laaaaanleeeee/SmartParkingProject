@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
-import { getParkingLotDetail } from "../services/ParkingLotService";
-import { getMyVehicles } from "../services/VehicleService";
-import { getSlotByParkingLotId } from "../services/SlotService";
-import { createBooking } from "../services/BookingService";
-import { createPayment } from "../services/PaymentService";
+import { getParkingLotDetail } from "@/services/ParkingLotService";
+import { getMyVehicles } from "@/services/VehicleService";
+import { getSlotByParkingLotId } from "@/services/SlotService";
+import { createBooking } from "@/services/BookingService";
+import { createPayment } from "@/services/PaymentService";
 import { Form, Button, DatePicker, Select, message, Spin } from "antd";
 import { Car, MapPin } from "lucide-react";
 import moment from "moment";
-import { useTheme } from "../hooks/useTheme";
+import { useTheme } from "@/hooks/useTheme";
 
 const { Option } = Select;
 

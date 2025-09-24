@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect } from "react";
 import { message } from "antd";
-import api from "../api/axiosInstance";
+import api from "@/api/axiosInstance";
 import { useNavigate } from "react-router-dom";
 
 export const AuthContext = createContext();

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { useTheme } from "../hooks/useTheme";
+import { useTheme } from "@/hooks/useTheme";
 import { Carousel, Spin, Empty } from "antd";
-import { getAllNews } from "../services/NewsService";
-import Img1 from '../assets/parkinglotimg.jpg';
+import { getAllNews } from "@/services/NewsService";
+import Img1 from '@/assets/parkinglotimg.jpg';
 
 const NewsEvents = () => {
   const { theme } = useTheme();

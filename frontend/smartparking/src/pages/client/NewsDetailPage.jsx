@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getNewsById } from "../services/NewsService";
+import { getNewsById } from "@/services/NewsService";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import { FloatButton } from "antd";
-import Img1 from "../assets/parkinglotimg.jpg";
-import { useTheme } from "../hooks/useTheme";
+import Img1 from "@/assets/parkinglotimg.jpg";
+import { useTheme } from "@/hooks/useTheme";
 
 const NewsDetailPage = () => {
     const { id } = useParams();

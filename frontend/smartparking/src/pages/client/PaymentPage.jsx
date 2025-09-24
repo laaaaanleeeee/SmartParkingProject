@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Button, message, Typography, Card } from "antd";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { getBookingById, confirmBooking, cancelBooking } from "../services/BookingService";
-import { refundPayment, getPaymentByBooking } from "../services/PaymentService";
+import { getBookingById, confirmBooking, cancelBooking } from "@/services/BookingService";
+import { refundPayment, getPaymentByBooking } from "@/services/PaymentService";
 import moment from "moment";
 
 const { Title, Text } = Typography;
